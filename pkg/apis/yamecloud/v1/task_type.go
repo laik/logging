@@ -14,13 +14,24 @@ type LoggingTask struct {
 }
 
 type Task struct {
-	PodName string `json:"pod_name,omitempty"`
+	ServiceName string   `json:"service_name,omitempty"`
+	Ns          string   `json:"ns,omitempty"`
+	PodName     string   `json:"pod_name,omitempty"`
+	Ips         []string `json:"ips,omitempty"`
+	Output      string   `json:"output,omitempty"`
+	Node        string   `json:"node,omitempty"`
+	Rules       []Rule   `json:"rules,omitempty"`
+}
+
+type Rule struct {
+	MaxLength  uint64 `json:"max_length,omitempty"`
+	Expression string `json:"expression,omitempty"`
 }
 
 type LoggingTaskSpec struct {
-	AddTasks    []Task `json:"add_tasks,omitempty"`
-	DeleteTasks []Task `json:"delete_tasks,omitempty"`
-	AllTasks    []Task `json:"all_tasks,omitempty"`
+	AddTasks    map[string]Task `json:"add_tasks,omitempty"`
+	DeleteTasks map[string]Task `json:"delete_tasks,omitempty"`
+	AllTasks    map[string]Task `json:"all_tasks,omitempty"`
 }
 
 type LoggingTaskStatus struct {

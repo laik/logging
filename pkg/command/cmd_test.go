@@ -9,11 +9,12 @@ func Test_run_command(t *testing.T) {
 	cmd := NewCmd()
 	pod1 := NewPod().SetName("echeor-api").SetNodeName("node1").SetOffset(1024).AddIp("127.0.0.1").AddIp("127.0.0.1")
 	pod2 := NewPod().SetName("echeor-api").SetNodeName("node1").SetOffset(1023).AddIp("127.0.0.1").AddIp("128.0.0.1")
-	cmdStr, err := cmd.SetOutput("kafka:test@10.200.100.200:9092").SetNs("test").SetRule("").AddPod(pod1).AddPod(pod2).Run()
-	if err != nil {
-		t.Fatalf("%s", err)
-	}
+	cmd.SetOutput("kafka:test@10.200.100.200:9092").SetNs("test").SetRule("").AddPod(pod1).AddPod(pod2).Run()
 
+	cmdStr, err := cmd.ToString()
+	if err != nil {
+		t.Fatal(err)
+	}
 	expectedCmd := NewCmd()
 	if err := json.Unmarshal([]byte(cmdStr), &expectedCmd); err != nil {
 		t.Fatalf("%s", err)

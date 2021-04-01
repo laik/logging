@@ -27,3 +27,9 @@ generate: controller-gen
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: generate controller-gen
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=deploy/crds
+
+install: manifests
+	kubectl apply -f deploy/crds/
+
+uninstall: manifests
+	kubectl delete -f deploy/crds/

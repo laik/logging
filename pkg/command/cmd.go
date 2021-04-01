@@ -1,13 +1,13 @@
 package command
 
-import "encoding/json"
+import "k8s.io/apimachinery/pkg/util/json"
 
 type Op = string
 
 const (
 	RUN   Op = "run"
 	STOP  Op = "stop"
-	Hello Op = "hello"
+	HELLO Op = "hello"
 )
 
 type Pod struct {
@@ -58,8 +58,7 @@ func NewCmd() *Cmd {
 	}
 }
 
-func (c *Cmd) Run() (string, error) {
-	c.Op = RUN
+func (c *Cmd) ToString() (string, error) {
 	bs, err := json.Marshal(c)
 	if err != nil {
 		return "", err
@@ -67,43 +66,43 @@ func (c *Cmd) Run() (string, error) {
 	return string(bs), nil
 }
 
-func (c *Cmd) Stop() (string, error) {
-	c.Op = STOP
-	bs, err := json.Marshal(c)
-	if err != nil {
-		return "", err
-	}
+func (c *Cmd) Run() *Cmd {
+	c.Op = RUN
+	return c
+}
 
-	return string(bs), nil
+func (c *Cmd) Stop() *Cmd {
+	c.Op = STOP
+	return c
+}
+
+func (c *Cmd) Hello() *Cmd {
+	c.Op = HELLO
+	return c
 }
 
 func (c *Cmd) SetOutput(o string) *Cmd {
 	c.Output = o
-
 	return c
 }
 
 func (c *Cmd) SetRule(o string) *Cmd {
 	c.Rules = o
-
 	return c
 }
 
 func (c *Cmd) SetNs(o string) *Cmd {
 	c.Ns = o
-
 	return c
 }
 
 func (c *Cmd) AddPod(pod *Pod) *Cmd {
 	position := -1
-
 	for index, v := range c.Pods {
 		if v.Name == pod.Name {
 			position = index
 		}
 	}
-
 	if position == -1 {
 		c.Pods = append(c.Pods, *pod)
 		return c
@@ -120,7 +119,6 @@ func (c *Cmd) AddIp(pod *Pod, ip string) *Cmd {
 		}
 		v.AddIp(ip)
 	}
-
 	return c
 }
 
@@ -130,6 +128,5 @@ func stringSliceContains(slice []string, item string) bool {
 			return true
 		}
 	}
-
 	return false
 }

@@ -6,28 +6,31 @@ import (
 	"k8s.io/client-go/dynamic/dynamicinformer"
 )
 
+type InitResource func(*Resources)
+
 type ResourceLister interface {
 	Ranges(d dynamicinformer.DynamicSharedInformerFactory, stop <-chan struct{})
 	GetGvr(string) (schema.GroupVersionResource, error)
 }
+
 type Resources struct {
 	excluded []string
 
 	Data map[string]schema.GroupVersionResource
 }
 
-func NewResources(excluded []string) *Resources {
+func NewResources(excluded []string, inits ...InitResource) ResourceLister {
 	rs := &Resources{
 		excluded: excluded,
 		Data:     make(map[string]schema.GroupVersionResource),
 	}
-
-	rsInit(rs)
-
+	for _, init := range inits {
+		init(rs)
+	}
 	return rs
 }
 
-func (m *Resources) register(s string, resource schema.GroupVersionResource) {
+func (m *Resources) Registry(s string, resource schema.GroupVersionResource) {
 	if _, exist := m.Data[s]; exist {
 		return
 	}
