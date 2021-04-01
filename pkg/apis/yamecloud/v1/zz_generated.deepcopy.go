@@ -28,7 +28,7 @@ import (
 func (in *LoggingTask) DeepCopyInto(out *LoggingTask) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
 	in.Spec.DeepCopyInto(&out.Spec)
 	out.Status = in.Status
 }
@@ -55,7 +55,7 @@ func (in *LoggingTask) DeepCopyObject() runtime.Object {
 func (in *LoggingTaskList) DeepCopyInto(out *LoggingTaskList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]LoggingTask, len(*in))
@@ -132,7 +132,7 @@ func (in *LoggingTaskStatus) DeepCopy() *LoggingTaskStatus {
 func (in *Output) DeepCopyInto(out *Output) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
 	in.Spec.DeepCopyInto(&out.Spec)
 	out.Status = in.Status
 }
@@ -159,7 +159,7 @@ func (in *Output) DeepCopyObject() runtime.Object {
 func (in *OutputList) DeepCopyInto(out *OutputList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]Output, len(*in))
@@ -193,11 +193,6 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 	if in.Type != nil {
 		in, out := &in.Type, &out.Type
 		*out = new(OutputType)
-		**out = **in
-	}
-	if in.Topic != nil {
-		in, out := &in.Topic, &out.Topic
-		*out = new(string)
 		**out = **in
 	}
 	if in.Address != nil {
