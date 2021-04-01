@@ -1,0 +1,42 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: harvest
+  namespace: kube-system
+  labels:
+    app: harvest
+spec:
+  selector:
+    matchLabels:
+      app: harvest
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: harvest
+    spec:
+      volumes:
+        - name: docker-dir
+          hostPath:
+            path: /data/docker/containers
+      containers:
+        - name: harvest
+          image: 'yametech/harvest:latest'
+          command: [ "sh","-c" ]
+          # TODO: 参数可以自动从变量里拿
+          args:
+            - HOSTNAME=$NODE_NAME harvest --namespace kube-system --docker-dir /data/docker/containers --api-server http://172.16.150.183:9999
+          resources: { }
+          volumeMounts:
+            - name: docker-dir
+              mountPath: /data/docker/containers
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
