@@ -18,7 +18,7 @@ type Task struct {
 	Ns          string   `json:"ns,omitempty"`
 	PodName     string   `json:"pod_name,omitempty"`
 	Ips         []string `json:"ips,omitempty"`
-	Output      string   `json:"output,omitempty"`
+	Output      Output   `json:"output,omitempty"`
 	Node        string   `json:"node,omitempty"`
 	Rules       []Rule   `json:"rules,omitempty"`
 }

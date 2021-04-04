@@ -256,6 +256,7 @@ func (in *Task) DeepCopyInto(out *Task) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	in.Output.DeepCopyInto(&out.Output)
 	if in.Rules != nil {
 		in, out := &in.Rules, &out.Rules
 		*out = make([]Rule, len(*in))
