@@ -1,4 +1,4 @@
 // +k8s:deepcopy-gen=package
-// +groupName=yamecloud.io
+// +groupName=logging.yamecloud.io
 
 package v1

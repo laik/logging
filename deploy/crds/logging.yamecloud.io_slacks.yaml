@@ -1,0 +1,148 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: (devel)
+  creationTimestamp: null
+  name: slacks.logging.yamecloud.io
+spec:
+  group: logging.yamecloud.io
+  names:
+    kind: Slack
+    listKind: SlackList
+    plural: slacks
+    shortNames:
+    - slacks
+    singular: slack
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.add_tasks
+      name: add_tasks
+      type: string
+    - jsonPath: .spec.delete_tasks
+      name: delete_tasks
+      type: string
+    - jsonPath: .spec.all_tasks
+      name: all_tasks
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              add_tasks:
+                additionalProperties:
+                  properties:
+                    ips:
+                      items:
+                        type: string
+                      type: array
+                    node:
+                      type: string
+                    ns:
+                      type: string
+                    output:
+                      type: string
+                    pod_name:
+                      type: string
+                    rules:
+                      items:
+                        properties:
+                          expression:
+                            type: string
+                          max_length:
+                            format: int64
+                            type: integer
+                        type: object
+                      type: array
+                    service_name:
+                      type: string
+                  type: object
+                type: object
+              all_tasks:
+                additionalProperties:
+                  properties:
+                    ips:
+                      items:
+                        type: string
+                      type: array
+                    node:
+                      type: string
+                    ns:
+                      type: string
+                    output:
+                      type: string
+                    pod_name:
+                      type: string
+                    rules:
+                      items:
+                        properties:
+                          expression:
+                            type: string
+                          max_length:
+                            format: int64
+                            type: integer
+                        type: object
+                      type: array
+                    service_name:
+                      type: string
+                  type: object
+                type: object
+              delete_tasks:
+                additionalProperties:
+                  properties:
+                    ips:
+                      items:
+                        type: string
+                      type: array
+                    node:
+                      type: string
+                    ns:
+                      type: string
+                    output:
+                      type: string
+                    pod_name:
+                      type: string
+                    rules:
+                      items:
+                        properties:
+                          expression:
+                            type: string
+                          max_length:
+                            format: int64
+                            type: integer
+                        type: object
+                      type: array
+                    service_name:
+                      type: string
+                  type: object
+                type: object
+            type: object
+          status:
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

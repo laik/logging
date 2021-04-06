@@ -6,15 +6,15 @@ import (
 )
 
 const (
-	YameCloudApiGroup = "yamecloud.io"
+	loggingYameCloudApiVersion = "logging.yamecloud.io"
 
 	// Kubernetes
 	Namespace = "namespaces"
 	Pod       = "pods"
 
 	// Yamecloud Logging
-	Output      = "outputs"
-	LoggingTask = "loggingtasks"
+	Sink  = "sinks"
+	Slack = "slacks"
 )
 
 func KubernetesResourceInit(rs *k8s.Resources) {
@@ -26,6 +26,6 @@ func KubernetesResourceInit(rs *k8s.Resources) {
 
 func YameCloudResourceInit(rs *k8s.Resources) {
 	// yamecloud logging operator resource
-	rs.Registry(Output, schema.GroupVersionResource{Group: YameCloudApiGroup, Version: "v1", Resource: Output})
-	rs.Registry(LoggingTask, schema.GroupVersionResource{Group: YameCloudApiGroup, Version: "v1", Resource: LoggingTask})
+	rs.Registry(Sink, schema.GroupVersionResource{Group: loggingYameCloudApiVersion, Version: "v1", Resource: Sink})
+	rs.Registry(Slack, schema.GroupVersionResource{Group: loggingYameCloudApiVersion, Version: "v1", Resource: Slack})
 }
