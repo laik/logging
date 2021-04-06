@@ -6,20 +6,28 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: (devel)
   creationTimestamp: null
-  name: outputs.yamecloud.io
+  name: sinks.logging.yamecloud.io
 spec:
-  group: yamecloud.io
+  group: logging.yamecloud.io
   names:
-    kind: Output
-    listKind: OutputList
-    plural: outputs
-    singular: output
+    kind: Sink
+    listKind: SinkList
+    plural: sinks
+    shortNames:
+    - outputs
+    singular: sink
   scope: Namespaced
   versions:
-  - name: v1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.type
+      name: type
+      type: string
+    - jsonPath: .spec.address
+      name: address
+      type: string
+    name: v1
     schema:
       openAPIV3Schema:
-        description: Output is the ..
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -47,6 +55,7 @@ spec:
         type: object
     served: true
     storage: true
+    subresources: {}
 status:
   acceptedNames:
     kind: ""
