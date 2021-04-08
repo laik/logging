@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c705e712-2674-47b9-873c-3b28559865d8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/logging.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/deploy/exmaple/sink_example.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/deploy/exmaple/slack_example.yaml" afterDir="false" />
+    <list default="true" id="c705e712-2674-47b9-873c-3b28559865d8" name="Default Changelist" comment="change task/output to sink/slack">
+      <change afterPath="$PROJECT_DIR$/cmd/api-server/main.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/backend/main.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/dev/main.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/api/broadcask.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/api/other.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/core/dict.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/core/dict_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/core/object.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/service/const.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy/crds/yamecloud.io_loggingtasklists.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy/crds/yamecloud.io_loggingtasks.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy/crds/yamecloud.io_outputlists.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy/crds/yamecloud.io_outputs.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/apis/yamecloud/register.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/apis/yamecloud/register.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/doc.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/doc.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/output_type.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/output_type.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/task_type.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/slack_type.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/main.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deploy/crds/logging.yamecloud.io_slacks.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deploy/crds/logging.yamecloud.io_slacks.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/slack_type.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/slack_type.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/zz_generated.deepcopy.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/zz_generated.deepcopy.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/command/cmd.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/command/cmd.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/command/cmd_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/command/cmd_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/service/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/service/service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/types/type_list.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/types/type_list.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,6 +37,14 @@
   <component name="GOROOT" url="file://$USER_HOME$/golang/go1.14.13" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="ProjectId" id="1pVXIaH9G4CCEHSFi3Ztmz3gTii" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -56,7 +67,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
     <property name="go.vendoring.notification.had.been.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/hack" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/pkg/core" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -67,45 +78,29 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/pkg/core" />
       <recent name="$PROJECT_DIR$/hack" />
       <recent name="$PROJECT_DIR$/pkg/apis" />
       <recent name="$PROJECT_DIR$/deploy/crd" />
       <recent name="$PROJECT_DIR$/pkg" />
-      <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/cmd/api-server" />
+      <recent name="$PROJECT_DIR$/pkg/service" />
+      <recent name="$PROJECT_DIR$/pkg/core" />
       <recent name="$PROJECT_DIR$/pkg/apis/yamecloud" />
       <recent name="$PROJECT_DIR$/pkg/apis/yamecloud/logging" />
-      <recent name="$PROJECT_DIR$/pkg/types" />
-      <recent name="$PROJECT_DIR$/pkg/command" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build github.com/yametech/logging/cmd">
-    <configuration name="go build github.com/yametech/logging/cmd" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Build.go build github.com/yametech/logging/cmd/api-server">
+    <configuration name="go build github.com/yametech/logging/cmd/api-server" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="logging" />
       <working_directory value="$PROJECT_DIR$" />
-      <parameters value="-ns default" />
+      <parameters value="--ns kube-system" />
       <kind value="PACKAGE" />
-      <filePath value="$PROJECT_DIR$/cmd/main.go" />
-      <package value="github.com/yametech/logging/cmd" />
+      <filePath value="$PROJECT_DIR$/cmd/api-server/main.go" />
+      <package value="github.com/yametech/logging/cmd/api-server" />
       <directory value="$PROJECT_DIR$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Test_run_command in github.com/yametech/logging/pkg/command" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="logging" />
-      <working_directory value="$PROJECT_DIR$/pkg/command" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="github.com/yametech/logging/pkg/command" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <pattern value="^\QTest_run_command\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="generate" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
-      <makefile filename="$PROJECT_DIR$/Makefile" target="generate" workingDirectory="" arguments="">
-        <envs />
-      </makefile>
       <method v="2" />
     </configuration>
     <configuration name="install" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
@@ -114,26 +109,14 @@
       </makefile>
       <method v="2" />
     </configuration>
-    <configuration name="manifests" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
-      <makefile filename="$PROJECT_DIR$/Makefile" target="manifests" workingDirectory="" arguments="">
-        <envs />
-      </makefile>
-      <method v="2" />
-    </configuration>
     <list>
-      <item itemvalue="Go Build.go build github.com/yametech/logging/cmd" />
-      <item itemvalue="Go Test.Test_run_command in github.com/yametech/logging/pkg/command" />
-      <item itemvalue="Makefile.generate" />
-      <item itemvalue="Makefile.manifests" />
       <item itemvalue="Makefile.install" />
+      <item itemvalue="Go Build.go build github.com/yametech/logging/cmd/api-server" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build github.com/yametech/logging/cmd" />
+        <item itemvalue="Go Build.go build github.com/yametech/logging/cmd/api-server" />
         <item itemvalue="Makefile.install" />
-        <item itemvalue="Go Test.Test_run_command in github.com/yametech/logging/pkg/command" />
-        <item itemvalue="Makefile.manifests" />
-        <item itemvalue="Makefile.generate" />
       </list>
     </recent_temporary>
   </component>
@@ -157,7 +140,8 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="add base serivce and api" />
     <MESSAGE value="add task type" />
-    <option name="LAST_COMMIT_MESSAGE" value="add task type" />
+    <MESSAGE value="change task/output to sink/slack" />
+    <option name="LAST_COMMIT_MESSAGE" value="change task/output to sink/slack" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -166,31 +150,5 @@
         <entry key="GOPROXY" value="https://goproxy.cn,https://goproxy.io,https://mirrors.aliyun.com/goproxy/,https://athens.azurefd.net,direct" />
       </map>
     </environment>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/pkg/command/cmd_test.go</url>
-          <line>17</line>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/pkg/command/cmd_test.go</url>
-          <line>11</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/pkg/datasource/k8s/types.go</url>
-          <line>47</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/cmd/main.go</url>
-          <line>49</line>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

@@ -1,6 +1,9 @@
 package command
 
-import "k8s.io/apimachinery/pkg/util/json"
+import (
+	"fmt"
+	"k8s.io/apimachinery/pkg/util/json"
+)
 
 type Op = string
 
@@ -11,10 +14,11 @@ const (
 )
 
 type Pod struct {
-	Name     string   `json:"name"`
-	NodeName string   `json:"node_name"`
-	Ips      []string `json:"ips"`
-	Offset   uint64   `json:"offset"`
+	PodName   string   `json:"pod_name"`
+	NodeName  string   `json:"node_name"`
+	Container string   `json:"container"`
+	Ips       []string `json:"ips"`
+	Offset    uint64   `json:"offset"`
 }
 
 func NewPod() *Pod {
@@ -22,12 +26,19 @@ func NewPod() *Pod {
 }
 
 func (p *Pod) SetName(name string) *Pod {
-	p.Name = name
+	p.PodName = name
 	return p
 }
 
 func (p *Pod) SetNodeName(name string) *Pod {
 	p.NodeName = name
+	return p
+}
+
+func (p *Pod) SetIPs(ips ...string) *Pod {
+	for _, ip := range ips {
+		p.AddIp(ip)
+	}
 	return p
 }
 
@@ -45,11 +56,14 @@ func (p *Pod) SetOffset(offset uint64) *Pod {
 }
 
 type Cmd struct {
-	Op     Op     `json:"op"`
-	Ns     string `json:"ns"`
-	Rules  string `json:"rules"`
-	Output string `json:"output"`
-	Pods   []Pod  `json:"pods"`
+	Op Op     `json:"op"`
+	Ns string `json:"ns"`
+
+	Filter      map[string]string `json:"filter"`
+	Output      string            `json:"output"`
+	ServiceName string            `json:"service_name"`
+
+	Pods []Pod `json:"pods"`
 }
 
 func NewCmd() *Cmd {
@@ -66,19 +80,21 @@ func (c *Cmd) ToString() (string, error) {
 	return string(bs), nil
 }
 
-func (c *Cmd) Run() *Cmd {
-	c.Op = RUN
+func (c *Cmd) SetOp(op Op) *Cmd {
+	c.Op = op
 	return c
+}
+
+func (c *Cmd) Run() *Cmd {
+	return c.SetOp(RUN)
 }
 
 func (c *Cmd) Stop() *Cmd {
-	c.Op = STOP
-	return c
+	return c.SetOp(STOP)
 }
 
 func (c *Cmd) Hello() *Cmd {
-	c.Op = HELLO
-	return c
+	return c.SetOp(HELLO)
 }
 
 func (c *Cmd) SetOutput(o string) *Cmd {
@@ -86,8 +102,9 @@ func (c *Cmd) SetOutput(o string) *Cmd {
 	return c
 }
 
-func (c *Cmd) SetRule(o string) *Cmd {
-	c.Rules = o
+func (c *Cmd) SetFilter(maxLength uint64, expr string) *Cmd {
+	c.Filter["max_length"] = fmt.Sprintf("%d", maxLength)
+	c.Filter["expr"] = expr
 	return c
 }
 
@@ -96,10 +113,15 @@ func (c *Cmd) SetNs(o string) *Cmd {
 	return c
 }
 
+func (c *Cmd) SetServiceName(o string) *Cmd {
+	c.ServiceName = o
+	return c
+}
+
 func (c *Cmd) AddPod(pod *Pod) *Cmd {
 	position := -1
 	for index, v := range c.Pods {
-		if v.Name == pod.Name {
+		if v.PodName == pod.PodName {
 			position = index
 		}
 	}
@@ -114,7 +136,7 @@ func (c *Cmd) AddPod(pod *Pod) *Cmd {
 
 func (c *Cmd) AddIp(pod *Pod, ip string) *Cmd {
 	for _, v := range c.Pods {
-		if v.Name != pod.Name {
+		if v.PodName != pod.PodName {
 			continue
 		}
 		v.AddIp(ip)

@@ -17,28 +17,37 @@ type Slack struct {
 	Status SlackStatus `json:"status,omitempty"`
 }
 
-type Content struct {
-	ServiceName string   `json:"service_name,omitempty"`
-	Ns          string   `json:"ns,omitempty"`
-	PodName     string   `json:"pod_name,omitempty"`
-	Ips         []string `json:"ips,omitempty"`
-	Output      string   `json:"output,omitempty"`
-	Node        string   `json:"node,omitempty"`
-	Rules       []Rule   `json:"rules,omitempty"`
+type Task struct {
+	Ns          string `json:"ns"`
+	ServiceName string `json:"service_name"`
+	Filter      Filter `json:"filter"`
+	Output      string `json:"output"`
+	Pods        []Pod  `json:"pods"`
 }
 
-type Rule struct {
-	MaxLength  uint64 `json:"max_length,omitempty"`
-	Expression string `json:"expression,omitempty"`
+type Pod struct {
+	Node      string   `json:"node"`
+	Pod       string   `json:"pod"`
+	Container string   `json:"container"`
+	Ips       []string `json:"ips"`
+	Offset    int      `json:"offset"`
+}
+
+type Filter struct {
+	MaxLength uint64 `json:"max_length,omitempty"`
+	Expr      string `json:"expr,omitempty"`
 }
 
 type SlackSpec struct {
-	AddTasks    map[string]Content `json:"add_tasks,omitempty"`
-	DeleteTasks map[string]Content `json:"delete_tasks,omitempty"`
-	AllTasks    map[string]Content `json:"all_tasks,omitempty"`
+	IsCollectAll  bool              `json:"collect_all,omitempty"`
+	LabelSelector map[string]string `json:"label_selector"`
+
+	AddTasks    map[string]Task `json:"add_tasks,omitempty"`
+	DeleteTasks map[string]Task `json:"delete_tasks,omitempty"`
 }
 
 type SlackStatus struct {
+	AllTasks map[string]Task `json:"all_tasks,omitempty"`
 }
 
 func init() {
