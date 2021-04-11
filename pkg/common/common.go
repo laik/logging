@@ -19,6 +19,8 @@ const (
 	ERROR = "[ERROR]"
 )
 
+const NamespaceSlackName = "%s-logging-slack"
+
 func init() {
 	flag.BoolVar(&InCluster, "incluster", false, "-incluster true")
 

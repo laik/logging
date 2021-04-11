@@ -15,7 +15,7 @@ func (o Object) Get(path string) interface{} { return Get(o, path) }
 func (o Object) Delete(path string) { Delete(o, path) }
 
 func FromUnstructured(u unstructured.Unstructured) Object {
-	return Object(u.Object)
+	return u.Object
 }
 
 func FromRuntimeObject(r runtime.Object) (Object, error) {
@@ -36,4 +36,16 @@ func CopyToRuntimeObject(src *unstructured.Unstructured, target runtime.Object) 
 		return err
 	}
 	return json.Unmarshal(bytesData, target)
+}
+
+func CopyFromRObject(src runtime.Object) (*unstructured.Unstructured, error) {
+	bytesData, err := json.Marshal(src)
+	if err != nil {
+		return nil, err
+	}
+	target := &unstructured.Unstructured{}
+	if err := json.Unmarshal(bytesData, target); err != nil {
+		return nil, err
+	}
+	return target, nil
 }

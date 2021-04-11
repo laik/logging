@@ -2,24 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c705e712-2674-47b9-873c-3b28559865d8" name="Default Changelist" comment="change task/output to sink/slack">
-      <change afterPath="$PROJECT_DIR$/cmd/api-server/main.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/backend/main.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/dev/main.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/api/broadcask.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/api/other.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/core/dict.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/core/dict_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/core/object.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/service/const.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/main.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/deploy/crds/logging.yamecloud.io_slacks.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deploy/crds/logging.yamecloud.io_slacks.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/broadcask.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/broadcask.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/other.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/other.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/api/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/server.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/slack_type.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/slack_type.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/zz_generated.deepcopy.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/zz_generated.deepcopy.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/command/cmd.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/command/cmd.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/command/cmd_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/command/cmd_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/client/interface.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/client/interface.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/common/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/common/common.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/core/object.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/core/object.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/datasource/datasource.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/datasource/datasource.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/service/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/service/service.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -61,13 +56,14 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="ToolWindowDebug.ShowToolbar" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="configurable..is.expanded" value="false" />
     <property name="configurable.GoLibrariesConfigurable.is.expanded" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
     <property name="go.vendoring.notification.had.been.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/pkg/core" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -110,8 +106,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Makefile.install" />
       <item itemvalue="Go Build.go build github.com/yametech/logging/cmd/api-server" />
+      <item itemvalue="Makefile.install" />
     </list>
     <recent_temporary>
       <list>
@@ -141,7 +137,8 @@
     <MESSAGE value="add base serivce and api" />
     <MESSAGE value="add task type" />
     <MESSAGE value="change task/output to sink/slack" />
-    <option name="LAST_COMMIT_MESSAGE" value="change task/output to sink/slack" />
+    <MESSAGE value="add slack push logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="add slack push logic" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -150,5 +147,21 @@
         <entry key="GOPROXY" value="https://goproxy.cn,https://goproxy.io,https://mirrors.aliyun.com/goproxy/,https://athens.azurefd.net,direct" />
       </map>
     </environment>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/api/other.go</url>
+          <line>35</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/cmd/api-server/main.go</url>
+          <line>32</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

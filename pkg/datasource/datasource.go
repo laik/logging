@@ -22,6 +22,7 @@ type IDataSource interface {
 	Apply(namespace, resource, name string, obj *unstructured.Unstructured, forceUpdate bool) (*unstructured.Unstructured, bool, error)
 	Delete(namespace, resource, name string) error
 	Watch(namespace string, resource, resourceVersion string, timeoutSeconds int64, selector interface{}) (<-chan watch.Event, error)
+	UpdateStatus(namespace, resource string, obj *unstructured.Unstructured) error
 }
 
 func NewIDataSource(cfg *configure.InstallConfigure) IDataSource {
@@ -30,6 +31,22 @@ func NewIDataSource(cfg *configure.InstallConfigure) IDataSource {
 
 type IDataSourceImpl struct {
 	*configure.InstallConfigure
+}
+
+func (i *IDataSourceImpl) UpdateStatus(namespace, resource string, obj *unstructured.Unstructured) error {
+	return retry.RetryOnConflict(retry.DefaultBackoff, func() error {
+		gvr, err := i.GetGvr(resource)
+		if err != nil {
+			return err
+		}
+		_, err = i.CacheInformerFactory.
+			Interface.
+			Resource(gvr).
+			Namespace(namespace).
+			UpdateStatus(context.Background(), obj, metav1.UpdateOptions{})
+
+		return err
+	})
 }
 
 func (i *IDataSourceImpl) List(namespace, resource, flag string, pos, size int64, selector interface{}) (*unstructured.UnstructuredList, error) {

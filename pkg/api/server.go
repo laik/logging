@@ -1,14 +1,18 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	v1 "github.com/yametech/logging/pkg/apis/yamecloud/v1"
+	"github.com/yametech/logging/pkg/client"
 	"github.com/yametech/logging/pkg/command"
 	"github.com/yametech/logging/pkg/common"
 	"github.com/yametech/logging/pkg/core"
 	"github.com/yametech/logging/pkg/service"
 	"io"
 	"k8s.io/apimachinery/pkg/watch"
+	"strings"
 	"time"
 )
 
@@ -28,7 +32,7 @@ func NewServer(addr string, ns string, service service.IService) *Server {
 		addr: addr,
 		ns:   ns,
 
-		broadcast: &Broadcast{make(map[string]chan string)},
+		broadcast: NewBroadcast(),
 		engine:    gin.Default(),
 		service:   service,
 
@@ -94,7 +98,17 @@ func (s *Server) watchSlack(errors chan error) {
 				}
 
 			case watch.Deleted:
-				for _, task := range taskList(object, "status.all_tasks") {
+				podResults, ok := object.Get("status.all_tasks").([]v1.PodResult)
+				if !ok {
+					continue
+				}
+
+				for _, podResult := range podResults {
+					task := v1.Task{
+						Ns:     s.ns,
+						Filter: v1.Filter{},
+						Pods:   []v1.Pod{podResult.ToPod()},
+					}
 					cmdStr, err := taskToCmd(command.STOP, &task, "", "")
 					if err != nil {
 						fmt.Printf("%s failed to convert to cmd string %v\n", common.WARN, task)
@@ -103,11 +117,52 @@ func (s *Server) watchSlack(errors chan error) {
 					s.broadcast.Publish(cmdStr)
 				}
 			}
+
 			if version := object.Get("metadata.resourceVersion"); version != nil {
 				s.setResourceVersion(version.(string))
 			}
 		}
 	}
+}
+
+func (s *Server) scheduleTaskCollect() {
+	ticker := time.NewTicker(5 * time.Second)
+	for {
+		select {
+		case <-ticker.C:
+			slack, err := s.service.GetSlack(s.ns, fmt.Sprintf(common.NamespaceSlackName, s.ns))
+			if err != nil {
+				fmt.Printf("%s failed get slack\n", common.ERROR)
+				continue
+			}
+
+			allTasks := make([]v1.PodResult, 0)
+			for _, k := range s.broadcast.GetClientIPs() {
+				resp, err := client.NewHttpClient().IP(clientIp(k)).Port("8080").Get("/pods")
+				if err != nil {
+					fmt.Printf("%s failed to get node (%s) pods\n", common.WARN, clientNode(k))
+					continue
+				}
+				podResult := v1.PodResult{}
+				if err := json.Unmarshal([]byte(resp), &podResult); err != nil {
+					fmt.Printf("%s failed to get node (%s) unmarshal response data\n", common.WARN, clientNode(k))
+					continue
+				}
+				allTasks = append(allTasks, podResult)
+			}
+
+			if len(allTasks) == 0 {
+				continue
+			}
+
+			slack.Status.AllTasks = allTasks
+
+			if err := s.service.UpdateSlackStatus(s.ns, slack); err != nil {
+				fmt.Printf("%s failed update slack status\n", common.ERROR)
+			}
+		}
+	}
+
 }
 
 func (s *Server) Start() <-chan error {
@@ -120,13 +175,15 @@ func (s *Server) Start() <-chan error {
 		errors <- s.engine.Run(s.addr)
 	}()
 
+	go func() { s.scheduleTaskCollect() }()
+
 	return errors
 
 }
 
 func (s *Server) task(g *gin.Context) {
 	chanStream := make(chan string)
-	id := fmt.Sprintf("%s-%s", g.Param("node"), g.ClientIP())
+	id := clientID(g.Param("node"), g.ClientIP())
 	s.broadcast.Registry(id, chanStream)
 	defer s.broadcast.UnRegistry(id)
 
@@ -143,4 +200,22 @@ func (s *Server) task(g *gin.Context) {
 		}
 		return true
 	})
+}
+
+func clientID(node, ip string) string {
+	return fmt.Sprintf("%s-%s", node, ip)
+}
+
+func clientIp(id string) string {
+	if res := strings.Split(id, "-"); len(res) == 2 {
+		return res[1]
+	}
+	return ""
+}
+
+func clientNode(id string) string {
+	if res := strings.Split(id, "-"); len(res) == 2 {
+		return res[0]
+	}
+	return ""
 }

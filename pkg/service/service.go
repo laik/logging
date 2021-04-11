@@ -11,6 +11,8 @@ import (
 
 type IService interface {
 	WatchSlack(ns, resourceVersion string) (<-chan watch.Event, error)
+	UpdateSlackStatus(ns string, slack *v1.Slack) error
+	GetSlack(ns, name string) (*v1.Slack, error)
 
 	ListPod(ns string, selector string) ([]corev1.Pod, error)
 	WatchPod(ns string, resourceVersion, selector string) (<-chan watch.Event, error)
@@ -20,6 +22,27 @@ type IService interface {
 
 type Service struct {
 	datasource datasource.IDataSource
+}
+
+func (s *Service) GetSlack(ns, name string) (*v1.Slack, error) {
+	unstructuredData, err := s.datasource.Get(ns, types.Slack, name)
+	if err != nil {
+		return nil, err
+	}
+
+	slack := &v1.Slack{}
+	if err := core.CopyToRuntimeObject(unstructuredData, slack); err != nil {
+		return nil, err
+	}
+	return slack, nil
+}
+
+func (s *Service) UpdateSlackStatus(ns string, slack *v1.Slack) error {
+	slackUnstructured, err := core.CopyFromRObject(slack)
+	if err != nil {
+		return err
+	}
+	return s.datasource.UpdateStatus(ns, types.Slack, slackUnstructured)
 }
 
 func (s *Service) WatchSlack(ns, resourceVersion string) (<-chan watch.Event, error) {

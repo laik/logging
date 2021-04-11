@@ -154,53 +154,36 @@ spec:
           status:
             properties:
               all_tasks:
-                additionalProperties:
+                items:
                   properties:
-                    filter:
-                      properties:
-                        expr:
-                          type: string
-                        max_length:
-                          format: int64
-                          type: integer
-                      type: object
-                    ns:
+                    container:
                       type: string
-                    output:
-                      type: string
-                    pods:
+                    ips:
                       items:
-                        properties:
-                          container:
-                            type: string
-                          ips:
-                            items:
-                              type: string
-                            type: array
-                          node:
-                            type: string
-                          offset:
-                            type: integer
-                          pod:
-                            type: string
-                        required:
-                        - container
-                        - ips
-                        - node
-                        - offset
-                        - pod
-                        type: object
+                        type: string
                       type: array
-                    service_name:
+                    is_uploaded:
+                      type: boolean
+                    node:
+                      type: string
+                    offset:
+                      type: integer
+                    path:
+                      type: string
+                    pod:
+                      type: string
+                    state:
                       type: string
                   required:
-                  - filter
-                  - ns
-                  - output
-                  - pods
-                  - service_name
+                  - container
+                  - ips
+                  - node
+                  - offset
+                  - path
+                  - pod
+                  - state
                   type: object
-                type: object
+                type: array
             type: object
         type: object
     served: true

@@ -46,8 +46,29 @@ type SlackSpec struct {
 	DeleteTasks map[string]Task `json:"delete_tasks,omitempty"`
 }
 
+type PodResult struct {
+	Node       string   `json:"node"`
+	Pod        string   `json:"pod"`
+	Container  string   `json:"container"`
+	Ips        []string `json:"ips"`
+	Offset     int      `json:"offset"`
+	IsUploaded bool     `json:"is_uploaded,omitempty"`
+	State      string   `json:"state"`
+	Path       string   `json:"path"`
+}
+
+func (pr *PodResult) ToPod() Pod {
+	return Pod{
+		Node:      pr.Node,
+		Pod:       pr.Pod,
+		Container: pr.Container,
+		Ips:       pr.Ips,
+		Offset:    pr.Offset,
+	}
+}
+
 type SlackStatus struct {
-	AllTasks map[string]Task `json:"all_tasks,omitempty"`
+	AllTasks []PodResult `json:"all_tasks,omitempty"`
 }
 
 func init() {
