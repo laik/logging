@@ -46,6 +46,8 @@ spec:
             properties:
               address:
                 type: string
+              partition:
+                type: integer
               type:
                 type: string
             type: object

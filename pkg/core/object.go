@@ -49,3 +49,14 @@ func CopyFromRObject(src runtime.Object) (*unstructured.Unstructured, error) {
 	}
 	return target, nil
 }
+
+func Convert(src runtime.Object, target runtime.Object) error {
+	bytesData, err := json.Marshal(src)
+	if err != nil {
+		return err
+	}
+	if err := json.Unmarshal(bytesData, target); err != nil {
+		return err
+	}
+	return nil
+}

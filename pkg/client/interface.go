@@ -35,11 +35,11 @@ func (h httpClient) Port(port string) HttpClient {
 }
 
 func (h httpClient) Get(path string) (string, error) {
-	url := fmt.Sprintf("%s:%s%s", h.ip, h.port, path)
+	url := fmt.Sprintf("http://%s:%s%s", h.ip, h.port, path)
 	client := resty.New()
 	resp, err := client.R().SetHeader("Accept", "application/json").Get(url) //default json
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("get url %s error %s", url, err)
 	}
 	return resp.String(), nil
 }

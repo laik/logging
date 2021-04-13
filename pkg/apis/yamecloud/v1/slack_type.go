@@ -5,9 +5,8 @@ import (
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +kubebuilder:printcolumn:name="add_tasks",type=string,JSONPath=`.spec.add_tasks`
-// +kubebuilder:printcolumn:name="delete_tasks",type=string,JSONPath=`.spec.delete_tasks`
-// +kubebuilder:printcolumn:name="all_tasks",type=string,JSONPath=`.spec.all_tasks`
+// +kubebuilder:printcolumn:name="selector",type=string,JSONPath=`.spec.selector`
+// +kubebuilder:printcolumn:name="all_tasks",type=string,JSONPath=`.status.all_tasks`
 // +kubebuilder:resource:shortName=slacks
 type Slack struct {
 	metav1.TypeMeta   `json:",inline"`
@@ -21,7 +20,6 @@ type Task struct {
 	Ns          string `json:"ns"`
 	ServiceName string `json:"service_name"`
 	Filter      Filter `json:"filter"`
-	Output      string `json:"output"`
 	Pods        []Pod  `json:"pods"`
 }
 
@@ -34,41 +32,46 @@ type Pod struct {
 }
 
 type Filter struct {
-	MaxLength uint64 `json:"max_length,omitempty"`
+	MaxLength string `json:"max_length,omitempty"`
 	Expr      string `json:"expr,omitempty"`
 }
 
 type SlackSpec struct {
-	IsCollectAll  bool              `json:"collect_all,omitempty"`
-	LabelSelector map[string]string `json:"label_selector"`
-
-	AddTasks    map[string]Task `json:"add_tasks,omitempty"`
-	DeleteTasks map[string]Task `json:"delete_tasks,omitempty"`
+	Selector string `json:"selector,omitempty"`
+	// AddTasks that need to be collected
+	AddTasks []Task `json:"add_tasks,omitempty"`
+	// DeleteTasks
+	DeleteTasks []Task   `json:"delete_tasks,omitempty"`
+	AllTasks    []Record `json:"all_tasks,omitempty"`
 }
 
-type PodResult struct {
-	Node       string   `json:"node"`
-	Pod        string   `json:"pod"`
-	Container  string   `json:"container"`
-	Ips        []string `json:"ips"`
-	Offset     int      `json:"offset"`
-	IsUploaded bool     `json:"is_uploaded,omitempty"`
-	State      string   `json:"state"`
-	Path       string   `json:"path"`
+type Record struct {
+	Container   string   `json:"container"`
+	Ips         []string `json:"ips"`
+	IsUpload    bool     `json:"is_upload"`
+	LastOffset  int      `json:"last_offset"`
+	NodeName    string   `json:"node_name"`
+	Ns          string   `json:"ns"`
+	Offset      int      `json:"offset"`
+	Output      string   `json:"output"`
+	Path        string   `json:"path"`
+	PodName     string   `json:"pod_name"`
+	ServiceName string   `json:"service_name"`
+	State       string   `json:"state"`
+	Filter      `json:"filter"`
 }
 
-func (pr *PodResult) ToPod() Pod {
+func (r *Record) ToPod() Pod {
 	return Pod{
-		Node:      pr.Node,
-		Pod:       pr.Pod,
-		Container: pr.Container,
-		Ips:       pr.Ips,
-		Offset:    pr.Offset,
+		Node:      r.NodeName,
+		Pod:       r.PodName,
+		Container: r.Container,
+		Ips:       r.Ips,
+		Offset:    r.Offset,
 	}
 }
 
 type SlackStatus struct {
-	AllTasks []PodResult `json:"all_tasks,omitempty"`
 }
 
 func init() {

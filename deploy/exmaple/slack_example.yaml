@@ -1,9 +1,0 @@
----
-apiVersion: logging.yamecloud.io/v1
-kind: Slack
-metadata:
-  name: default-logging-task
-  namespace: default
-spec:
-  add_tasks: {}
-  delete_tasks: {}

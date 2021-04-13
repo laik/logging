@@ -29,8 +29,9 @@ type Sink struct {
 
 // OutputSpec defines the desired state of OutputSpec
 type SinkSpec struct {
-	Type    *OutputType `json:"type,omitempty"`
-	Address *string     `json:"address,omitempty"`
+	Type      *OutputType `json:"type,omitempty"`
+	Address   *string     `json:"address,omitempty"`
+	Partition *int        `json:"partition,omitempty"`
 }
 
 // OutputStatus defines the observed state of OutputStatus

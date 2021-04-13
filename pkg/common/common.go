@@ -20,6 +20,7 @@ const (
 )
 
 const NamespaceSlackName = "%s-logging-slack"
+const NamespaceSinkName = "%s-logging-sink"
 
 func init() {
 	flag.BoolVar(&InCluster, "incluster", false, "-incluster true")

@@ -1,9 +1,0 @@
----
-apiVersion: logging.yamecloud.io/v1
-kind: Sink
-metadata:
-  name: default-kafka-output
-  namespace: default
-spec:
-  type: kafka
-  address: 10.200.100.200:9090

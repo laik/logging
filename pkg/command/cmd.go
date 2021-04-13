@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"k8s.io/apimachinery/pkg/util/json"
 )
 
@@ -102,8 +101,11 @@ func (c *Cmd) SetOutput(o string) *Cmd {
 	return c
 }
 
-func (c *Cmd) SetFilter(maxLength uint64, expr string) *Cmd {
-	c.Filter["max_length"] = fmt.Sprintf("%d", maxLength)
+func (c *Cmd) SetFilter(maxLength, expr string) *Cmd {
+	if c.Filter == nil {
+		c.Filter = make(map[string]string)
+	}
+	c.Filter["max_length"] = maxLength
 	c.Filter["expr"] = expr
 	return c
 }

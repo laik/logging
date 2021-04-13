@@ -1,7 +1,9 @@
 package service
 
 import (
+	"fmt"
 	v1 "github.com/yametech/logging/pkg/apis/yamecloud/v1"
+	"github.com/yametech/logging/pkg/common"
 	"github.com/yametech/logging/pkg/core"
 	"github.com/yametech/logging/pkg/datasource"
 	"github.com/yametech/logging/pkg/types"
@@ -11,13 +13,13 @@ import (
 
 type IService interface {
 	WatchSlack(ns, resourceVersion string) (<-chan watch.Event, error)
-	UpdateSlackStatus(ns string, slack *v1.Slack) error
 	GetSlack(ns, name string) (*v1.Slack, error)
+	UpdateSlack(ns, name string, slack *v1.Slack) error
 
 	ListPod(ns string, selector string) ([]corev1.Pod, error)
 	WatchPod(ns string, resourceVersion, selector string) (<-chan watch.Event, error)
 
-	GetSink(ns, name string) (*v1.Sink, error)
+	GetSink(ns string) (*v1.Sink, error)
 }
 
 type Service struct {
@@ -37,12 +39,13 @@ func (s *Service) GetSlack(ns, name string) (*v1.Slack, error) {
 	return slack, nil
 }
 
-func (s *Service) UpdateSlackStatus(ns string, slack *v1.Slack) error {
-	slackUnstructured, err := core.CopyFromRObject(slack)
+func (s *Service) UpdateSlack(ns, name string, slack *v1.Slack) error {
+	unstructuredData, err := core.CopyFromRObject(slack)
 	if err != nil {
 		return err
 	}
-	return s.datasource.UpdateStatus(ns, types.Slack, slackUnstructured)
+	_, _, err = s.datasource.Apply(ns, types.Slack, name, unstructuredData, false)
+	return err
 }
 
 func (s *Service) WatchSlack(ns, resourceVersion string) (<-chan watch.Event, error) {
@@ -69,8 +72,8 @@ func (s *Service) WatchPod(ns string, resourceVersion, selector string) (<-chan 
 	return s.datasource.Watch(ns, types.Pod, resourceVersion, 0, selector)
 }
 
-func (s *Service) GetSink(ns, name string) (*v1.Sink, error) {
-	unstructuredData, err := s.datasource.Get(ns, types.Sink, name)
+func (s *Service) GetSink(ns string) (*v1.Sink, error) {
+	unstructuredData, err := s.datasource.Get(ns, types.Sink, fmt.Sprintf(common.NamespaceSinkName, ns))
 	if err != nil {
 		return nil, err
 	}

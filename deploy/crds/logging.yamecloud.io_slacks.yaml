@@ -19,13 +19,10 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.add_tasks
-      name: add_tasks
+    - jsonPath: .spec.selector
+      name: selector
       type: string
-    - jsonPath: .spec.delete_tasks
-      name: delete_tasks
-      type: string
-    - jsonPath: .spec.all_tasks
+    - jsonPath: .status.all_tasks
       name: all_tasks
       type: string
     name: v1
@@ -47,19 +44,17 @@ spec:
           spec:
             properties:
               add_tasks:
-                additionalProperties:
+                description: AddTasks that need to be collected
+                items:
                   properties:
                     filter:
                       properties:
                         expr:
                           type: string
                         max_length:
-                          format: int64
-                          type: integer
+                          type: string
                       type: object
                     ns:
-                      type: string
-                    output:
                       type: string
                     pods:
                       items:
@@ -86,104 +81,120 @@ spec:
                       type: array
                     service_name:
                       type: string
-                  required:
-                  - filter
-                  - ns
-                  - output
-                  - pods
-                  - service_name
-                  type: object
-                type: object
-              collect_all:
-                type: boolean
-              delete_tasks:
-                additionalProperties:
-                  properties:
-                    filter:
-                      properties:
-                        expr:
-                          type: string
-                        max_length:
-                          format: int64
-                          type: integer
-                      type: object
-                    ns:
-                      type: string
-                    output:
-                      type: string
-                    pods:
-                      items:
-                        properties:
-                          container:
-                            type: string
-                          ips:
-                            items:
-                              type: string
-                            type: array
-                          node:
-                            type: string
-                          offset:
-                            type: integer
-                          pod:
-                            type: string
-                        required:
-                        - container
-                        - ips
-                        - node
-                        - offset
-                        - pod
-                        type: object
-                      type: array
-                    service_name:
+                    sink:
                       type: string
                   required:
                   - filter
                   - ns
-                  - output
                   - pods
                   - service_name
+                  - sink
                   type: object
-                type: object
-              label_selector:
-                additionalProperties:
-                  type: string
-                type: object
-            required:
-            - label_selector
-            type: object
-          status:
-            properties:
+                type: array
               all_tasks:
                 items:
                   properties:
                     container:
                       type: string
+                    filter:
+                      properties:
+                        expr:
+                          type: string
+                        max_length:
+                          type: string
+                      type: object
                     ips:
                       items:
                         type: string
                       type: array
-                    is_uploaded:
+                    is_upload:
                       type: boolean
-                    node:
+                    last_offset:
+                      type: integer
+                    node_name:
+                      type: string
+                    ns:
                       type: string
                     offset:
                       type: integer
+                    output:
+                      type: string
                     path:
                       type: string
-                    pod:
+                    pod_name:
+                      type: string
+                    service_name:
                       type: string
                     state:
                       type: string
                   required:
                   - container
+                  - filter
                   - ips
-                  - node
+                  - is_upload
+                  - last_offset
+                  - node_name
+                  - ns
                   - offset
+                  - output
                   - path
-                  - pod
+                  - pod_name
+                  - service_name
                   - state
                   type: object
                 type: array
+              delete_tasks:
+                description: DeleteTasks
+                items:
+                  properties:
+                    filter:
+                      properties:
+                        expr:
+                          type: string
+                        max_length:
+                          type: string
+                      type: object
+                    ns:
+                      type: string
+                    pods:
+                      items:
+                        properties:
+                          container:
+                            type: string
+                          ips:
+                            items:
+                              type: string
+                            type: array
+                          node:
+                            type: string
+                          offset:
+                            type: integer
+                          pod:
+                            type: string
+                        required:
+                        - container
+                        - ips
+                        - node
+                        - offset
+                        - pod
+                        type: object
+                      type: array
+                    service_name:
+                      type: string
+                    sink:
+                      type: string
+                  required:
+                  - filter
+                  - ns
+                  - pods
+                  - service_name
+                  - sink
+                  type: object
+                type: array
+              selector:
+                type: string
+            type: object
+          status:
             type: object
         type: object
     served: true
