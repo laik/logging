@@ -190,6 +190,10 @@ func remove(slice []v1.Task, s int) []v1.Task {
 	return append(slice[:s], slice[s+1:]...)
 }
 
+func removeRecords(slice v1.Records, s int) {
+	slice = append(slice[:s], slice[s+1:]...)
+}
+
 func (s *Server) every5SecondCollect() {
 	for {
 		time.Sleep(5 * time.Second)
@@ -206,14 +210,18 @@ func (s *Server) every5SecondCollect() {
 				fmt.Printf("%s failed to get error %s\n", common.WARN, err)
 				continue
 			}
+
 			var tmpRecords = make([]v1.Record, 0)
 			if err := json.Unmarshal([]byte(resp), &tmpRecords); err != nil {
 				fmt.Printf("%s failed to get node: (%s) unmarshal response data: (%s) error: (%s) \n", common.WARN, clientNode(k), resp, err)
 				continue
 			}
-			for _, record := range tmpRecords {
+
+			for index, record := range tmpRecords {
 				if record.IsUpload {
 					allTasks = append(allTasks, record)
+				} else {
+					removeRecords(slack.Spec.AllTasks, index)
 				}
 			}
 		}

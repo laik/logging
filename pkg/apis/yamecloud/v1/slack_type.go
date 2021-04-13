@@ -36,13 +36,15 @@ type Filter struct {
 	Expr      string `json:"expr,omitempty"`
 }
 
+type Records = []Record
+
 type SlackSpec struct {
 	Selector string `json:"selector,omitempty"`
 	// AddTasks that need to be collected
 	AddTasks []Task `json:"add_tasks,omitempty"`
 	// DeleteTasks
-	DeleteTasks []Task   `json:"delete_tasks,omitempty"`
-	AllTasks    []Record `json:"all_tasks,omitempty"`
+	DeleteTasks []Task  `json:"delete_tasks,omitempty"`
+	AllTasks    Records `json:"all_tasks,omitempty"`
 }
 
 type Record struct {

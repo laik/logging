@@ -45,6 +45,9 @@ func (p *PodMonitorController) handle(podEvt watch.Event) error {
 				return err
 			}
 			slack.Spec.AddTasks = append(slack.Spec.AddTasks, p.podToTask(&pod))
+			if err := p.service.UpdateSlack(p.ns, slack.Name, slack); err != nil {
+				return err
+			}
 		}
 	case watch.Deleted:
 		slack, err := p.service.GetSlack(p.ns, fmt.Sprintf(common.NamespaceSlackName, p.ns))
@@ -52,9 +55,13 @@ func (p *PodMonitorController) handle(podEvt watch.Event) error {
 			return err
 		}
 		slack.Spec.DeleteTasks = append(slack.Spec.DeleteTasks, p.podToTask(&pod))
+		if err := p.service.UpdateSlack(p.ns, slack.Name, slack); err != nil {
+			return err
+		}
 	case watch.Error:
 		return fmt.Errorf("PodMonitorController handle watch error")
 	}
+
 	return nil
 }
 
