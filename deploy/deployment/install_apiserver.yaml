@@ -1,0 +1,43 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: logging-api-server
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logging-api-server
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: logging-api-server
+    spec:
+      containers:
+        - name: echoer-api
+          image: 'yametech/logging-api-server:v1.0.0'
+          args:
+            - '-ns ${NAMESPACE}'
+          env:
+            - name: GIN_MODE
+              value: release
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: logging-api-server
+  namespace: kube-system
+spec:
+  ports:
+    - name: '9999'
+      port: 9999
+      protocol: TCP
+      targetPort: 9999
+  selector:
+    app: logging-api-server
+  type: ClusterIP

@@ -12,8 +12,10 @@ import (
 	"github.com/yametech/logging/pkg/service"
 	"github.com/yametech/logging/pkg/utils"
 	"io"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -26,32 +28,189 @@ type Server struct {
 	service   service.IService
 
 	slackResourceVersion string
+	podResourceVersion   string
+
+	mutex    *sync.Mutex
+	curSlack *v1.Slack
+
+	needIgnoreBroadcast bool
 }
 
 func NewServer(addr string, ns string, service service.IService) *Server {
 	return &Server{
-		addr: addr,
-		ns:   ns,
+		addr:  addr,
+		ns:    ns,
+		mutex: &sync.Mutex{},
 
 		broadcast: NewBroadcast(),
 		engine:    gin.Default(),
 		service:   service,
 
 		slackResourceVersion: "0",
+		podResourceVersion:   "0",
+		needIgnoreBroadcast:  false,
 	}
 }
 
-func (s *Server) setResourceVersion(version string) {
-	s.slackResourceVersion = version
+func (p *Server) setNeedIgnoreBroadcastFalse() {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+	p.needIgnoreBroadcast = false
 }
 
-func (s *Server) handle(evt <-chan watch.Event, errors chan error) {
+func (p *Server) podToTask(pod *corev1.Pod) v1.Task {
+	pods := make([]v1.Pod, 0)
+	for _, c := range pod.Spec.Containers {
+		ips := make([]string, 0)
+		for _, ip := range pod.Status.PodIPs {
+			ips = append(ips, ip.IP)
+		}
+		pods = append(pods,
+			v1.Pod{
+				Node:      pod.Spec.NodeName,
+				Pod:       pod.Name,
+				Container: c.Name,
+				Ips:       ips,
+				Offset:    0,
+			},
+		)
+	}
+	return v1.Task{
+		Ns:          pod.Namespace,
+		ServiceName: pod.Labels["app"],
+		Filter:      v1.Filter{},
+		Pods:        pods,
+	}
+}
+
+func (p *Server) slackAddNeedRunTasks(task v1.Task) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	if p.curSlack == nil {
+		slack, err := p.service.GetSlack(p.ns, fmt.Sprintf(common.NamespaceSlackName, p.ns))
+		if err != nil {
+			return err
+		}
+		p.curSlack = slack
+	}
+
+	if p.curSlack == nil {
+		return nil
+	}
+
+	if p.curSlack.Spec.AddTasks == nil {
+		p.curSlack.Spec.AddTasks = make([]v1.Task, 0)
+		return nil
+	}
+
+	for _, _task := range p.curSlack.Spec.AddTasks {
+		if _task.ServiceName == task.ServiceName && _task.Ns == task.Ns {
+			continue
+		}
+	}
+
+	p.curSlack.Spec.AddTasks = append(p.curSlack.Spec.AddTasks, task)
+
+	return p.service.UpdateSlack(p.curSlack)
+}
+
+func (p *Server) slackAddNeedStopTasks(task v1.Task) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	if p.curSlack == nil {
+		slack, err := p.service.GetSlack(p.ns, fmt.Sprintf(common.NamespaceSlackName, p.ns))
+		if err != nil {
+			return err
+		}
+		p.curSlack = slack
+	}
+
+	if p.curSlack == nil {
+		return nil
+	}
+
+	if p.curSlack.Spec.DeleteTasks == nil {
+		p.curSlack.Spec.DeleteTasks = make([]v1.Task, 0)
+		return nil
+	}
+
+	for _, _task := range p.curSlack.Spec.DeleteTasks {
+		if _task.ServiceName == task.ServiceName && _task.Ns == task.Ns {
+			continue
+		}
+	}
+
+	p.curSlack.Spec.DeleteTasks = append(p.curSlack.Spec.DeleteTasks, task)
+
+	return p.service.UpdateSlack(p.curSlack)
+}
+
+func (p *Server) podHandle(podEvt watch.Event) error {
+	pod := corev1.Pod{}
+	if err := core.Convert(podEvt.Object, &pod); err != nil {
+		return err
+	}
+
+	if _, exist := pod.GetLabels()["app"]; !exist {
+		return nil
+	}
+
+	switch podEvt.Type {
+	case watch.Added, watch.Modified:
+		if pod.Status.Phase == corev1.PodRunning {
+			if err := p.slackAddNeedRunTasks(p.podToTask(&pod)); err != nil {
+				return err
+			}
+		}
+	case watch.Deleted:
+		if err := p.slackAddNeedStopTasks(p.podToTask(&pod)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (p *Server) podWatchStart(errors chan error) {
+	watchPodChan, err := p.service.WatchPod(p.ns, p.podResourceVersion, "")
+	if err != nil {
+		errors <- err
+	}
+	go func() {
+		for {
+			select {
+			case evt, ok := <-watchPodChan:
+				if !ok {
+					errors <- fmt.Errorf("%s", "watch pod task chan error")
+				}
+				if err := p.podHandle(evt); err != nil {
+					errors <- err
+				}
+			}
+		}
+	}()
+}
+
+func (p *Server) setSlackResourceVersion(version string) {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+	p.slackResourceVersion = version
+}
+
+func (p *Server) setPodResourceVersion(version string) {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+	p.slackResourceVersion = version
+}
+
+func (p *Server) slackHandle(evt <-chan watch.Event, errors chan error) {
 	ticker := time.NewTicker(5 * time.Second)
 	for {
 		select {
 		case <-ticker.C:
 			cmdStr, _ := command.NewCmd().Hello().SetFilter("0", "").ToString()
-			s.broadcast.Publish(cmdStr)
+			p.broadcast.Publish(cmdStr)
 
 		case slackEvent, ok := <-evt:
 			if !ok {
@@ -62,92 +221,144 @@ func (s *Server) handle(evt <-chan watch.Event, errors chan error) {
 			slack := v1.Slack{}
 			err := core.Convert(slackEvent.Object, &slack)
 			if err != nil {
-				fmt.Printf("[WARN] failed to get slack convert to core object %s\n", slackEvent.Object)
+				fmt.Printf("%s failed to get slack convert to core object %s\n", common.WARN, slackEvent.Object)
 				continue
 			}
 
 			switch slackEvent.Type {
 			case watch.Modified, watch.Added:
-				// add tasks
-				for index, task := range slack.Spec.AddTasks {
-					sink, err := s.service.GetSink(task.Ns)
-					if err != nil {
-						fmt.Printf("[ERROR] failed get sink on slack task (%s) error: %s\n", task.ServiceName, err)
-						continue
-					}
-
-					cmdStr, err := taskToCmd(command.RUN, &task, string(*sink.Spec.Type), *sink.Spec.Address)
-					if err != nil {
-						fmt.Printf("[ERROR] failed to convert to cmd string, data: (%v)\n", task)
-						continue
-					}
-
-					exist, err := utils.CheckTopicExist(*sink.Spec.Address, task.ServiceName)
-					if err != nil {
-						fmt.Printf("[ERROR] check sink address (%s) topic (%s) error: (%v)\n", *sink.Spec.Address, task.ServiceName, err)
-						continue
-					}
-					if !exist {
-						if err := utils.CreateTopic(*sink.Spec.Address, task.ServiceName, *sink.Spec.Partition); err != nil {
-							fmt.Printf("[ERROR] create topic address (%s) topic (%s) error: (%v)\n", *sink.Spec.Address, task.ServiceName, err)
-							continue
-						}
-					}
-
-					s.broadcast.Publish(cmdStr)
-
-					slack.Spec.AddTasks = remove(slack.Spec.AddTasks, index)
+				if p.needIgnoreBroadcast {
+					p.setNeedIgnoreBroadcastFalse()
+					continue
 				}
 
-				// delete tasks
-				for index, task := range slack.Spec.DeleteTasks {
-					cmdStr, err := taskToCmd(command.STOP, &task, "", "")
-					if err != nil {
-						fmt.Printf("[WARN] failed to convert to cmd string %v\n", task)
-						continue
-					}
+				if err := p.broadcastRunTask(); err != nil {
+					fmt.Printf("%s %s", common.WARN, err)
+					continue
+				}
 
-					s.broadcast.Publish(cmdStr)
-
-					slack.Spec.DeleteTasks = remove(slack.Spec.DeleteTasks, index)
+				if err := p.broadcastStopTask(); err != nil {
+					fmt.Printf("%s %s", common.WARN, err)
+					continue
 				}
 
 			case watch.Deleted:
 				for _, record := range slack.Spec.AllTasks {
-
 					cmdStr, err := recordToCmd(command.STOP, &record)
 					if err != nil {
 						fmt.Printf("%s failed to convert to cmd string %v\n", common.WARN, record)
 						continue
 					}
-
-					s.broadcast.Publish(cmdStr)
+					p.broadcast.Publish(cmdStr)
 				}
 			}
 
-			if err := s.service.UpdateSlack(s.ns, slack.Name, &slack); err != nil {
-				fmt.Printf("[ERROR] failed update slack after handle task (%v)", slack)
-				continue
-			}
-
-			s.setResourceVersion(slack.ResourceVersion)
+			p.setSlackResourceVersion(slack.ResourceVersion)
 		}
 	}
 }
 
-func (s *Server) watchSlack(errors chan error) {
-	slackEventChan, err := s.service.WatchSlack(s.ns, s.slackResourceVersion)
+func (p *Server) broadcastRunTask() error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	if p.curSlack == nil {
+		return nil
+	}
+
+	if p.curSlack.Spec.AddTasks == nil {
+		return nil
+	}
+
+	for _, task := range p.curSlack.Spec.AddTasks {
+		sink, err := p.service.GetSink(task.Ns)
+		if err != nil {
+			return fmt.Errorf("failed get sink on slack task (%s) error: %s\n", task.ServiceName, err)
+		}
+
+		cmdStr, err := taskToCmd(command.RUN, &task, string(*sink.Spec.Type), *sink.Spec.Address)
+		if err != nil {
+			return fmt.Errorf("failed to convert to cmd string, data: (%v)\n", task)
+		}
+
+		exist, err := utils.CheckTopicExist(*sink.Spec.Address, task.ServiceName)
+		if err != nil {
+			return fmt.Errorf("check sink address (%s) topic (%s) error: (%v)\n", *sink.Spec.Address, task.ServiceName, err)
+
+		}
+		if !exist {
+			if err := utils.CreateTopic(*sink.Spec.Address, task.ServiceName, *sink.Spec.Partition); err != nil {
+				return fmt.Errorf("create topic address (%s) topic (%s) error: (%v)\n", *sink.Spec.Address, task.ServiceName, err)
+			}
+		}
+
+		p.broadcast.Publish(cmdStr)
+
+		if err := p.removeRunTask(&task); err != nil {
+			return err
+		}
+	}
+
+	p.needIgnoreBroadcast = true
+
+	return nil
+}
+
+func (p *Server) broadcastStopTask() error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	if p.curSlack == nil {
+		return nil
+	}
+
+	if p.curSlack.Spec.DeleteTasks == nil {
+		return nil
+	}
+
+	for _, task := range p.curSlack.Spec.DeleteTasks {
+		cmdStr, err := taskToCmd(command.STOP, &task, "", "")
+		if err != nil {
+			return err
+		}
+		p.broadcast.Publish(cmdStr)
+		if err := p.removeStopTask(&task); err != nil {
+			return err
+		}
+	}
+
+	p.needIgnoreBroadcast = true
+
+	return nil
+}
+
+func (p *Server) watchSlack(errors chan error) {
+	slackEventChan, err := p.service.WatchSlack(p.ns, p.slackResourceVersion)
 	if err != nil {
 		errors <- fmt.Errorf("service watch task chan error")
 	}
-	s.handle(slackEventChan, errors)
+	p.slackHandle(slackEventChan, errors)
 }
 
-func (s *Server) firstCMDs() ([]string, *v1.Slack, error) {
+func (p *Server) slack() (*v1.Slack, error) {
+	p.mutex.Lock()
+	p.mutex.Unlock()
+
+	if p.curSlack == nil {
+		slack, err := p.service.GetSlack(p.ns, fmt.Sprintf(common.NamespaceSlackName, p.ns))
+		if err != nil {
+			return nil, err
+		}
+		p.curSlack = slack
+	}
+	return p.curSlack, nil
+}
+
+func (p *Server) firstCMDs() ([]string, *v1.Slack, error) {
 	result := make([]string, 0)
-	slack, err := s.service.GetSlack(s.ns, fmt.Sprintf(common.NamespaceSlackName, s.ns))
+
+	slack, err := p.slack()
 	if err != nil {
-		fmt.Printf("%s loop collect client info , failed get slack (%s)\n", common.ERROR, fmt.Sprintf(common.NamespaceSlackName, s.ns))
 		return nil, nil, err
 	}
 
@@ -157,54 +368,114 @@ func (s *Server) firstCMDs() ([]string, *v1.Slack, error) {
 		}
 		cmdStr, err := recordToCmd(command.RUN, &record)
 		if err != nil {
-			fmt.Printf("[WARN] failed to convert to cmd string %v\n", record)
-			continue
+			return nil, nil, err
 		}
 		result = append(result, cmdStr)
 	}
 
 	for _, task := range slack.Spec.AddTasks {
-		cmdStr, err := taskToCmd(command.STOP, &task, "", "")
+		cmdStr, err := taskToCmd(command.RUN, &task, "", "")
 		if err != nil {
-			fmt.Printf("[WARN] failed to convert to cmd string %v\n", task)
-			continue
+			return nil, nil, err
 		}
 		result = append(result, cmdStr)
 	}
 
-	// delete tasks
-	for index, task := range slack.Spec.DeleteTasks {
+	for _, task := range slack.Spec.DeleteTasks {
 		cmdStr, err := taskToCmd(command.STOP, &task, "", "")
 		if err != nil {
-			fmt.Printf("[WARN] failed to convert to cmd string %v\n", task)
-			continue
+			return nil, nil, err
 		}
 		result = append(result, cmdStr)
-		slack.Spec.DeleteTasks = remove(slack.Spec.DeleteTasks, index)
+
+		if err := p.removeStopTask(&task); err != nil {
+			return nil, nil, err
+		}
 	}
 
 	return result, slack, nil
 }
 
-func remove(slice []v1.Task, s int) []v1.Task {
-	return append(slice[:s], slice[s+1:]...)
+func (p *Server) removeRunTask(task *v1.Task) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	if p.curSlack == nil {
+		return nil
+	}
+
+	if p.curSlack.Spec.AddTasks == nil {
+		p.curSlack.Spec.AddTasks = make([]v1.Task, 0)
+		return nil
+	}
+
+	for index, _task := range p.curSlack.Spec.AddTasks {
+		if _task.Ns == task.Ns && _task.ServiceName == task.ServiceName {
+			p.curSlack.Spec.AddTasks = append(
+				p.curSlack.Spec.AddTasks[:index],
+				p.curSlack.Spec.AddTasks[index+1:]...,
+			)
+		}
+	}
+
+	return p.service.UpdateSlack(p.curSlack)
 }
 
-func removeRecords(slice v1.Records, s int) {
-	slice = append(slice[:s], slice[s+1:]...)
+func (p *Server) removeStopTask(task *v1.Task) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	if p.curSlack == nil {
+		return nil
+	}
+
+	if p.curSlack.Spec.DeleteTasks == nil {
+		p.curSlack.Spec.DeleteTasks = make([]v1.Task, 0)
+		return nil
+	}
+
+	for index, _task := range p.curSlack.Spec.DeleteTasks {
+		if _task.Ns == task.Ns && _task.ServiceName == task.ServiceName {
+			p.curSlack.Spec.DeleteTasks = append(
+				p.curSlack.Spec.DeleteTasks[:index],
+				p.curSlack.Spec.DeleteTasks[index+1:]...,
+			)
+		}
+	}
+
+	return p.service.UpdateSlack(p.curSlack)
 }
 
-func (s *Server) every5SecondCollect() {
+func (p *Server) removeRecord(record *v1.Record) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	if p.curSlack == nil {
+		return nil
+	}
+
+	if p.curSlack.Spec.AllTasks == nil {
+		p.curSlack.Spec.AllTasks = make([]v1.Record, 0)
+		return nil
+	}
+
+	for index, _task := range p.curSlack.Spec.AllTasks {
+		if _task.Ns == record.Ns && _task.ServiceName == record.ServiceName {
+			p.curSlack.Spec.AllTasks = append(
+				p.curSlack.Spec.AllTasks[:index],
+				p.curSlack.Spec.AllTasks[index+1:]...,
+			)
+		}
+	}
+
+	return p.service.UpdateSlack(p.curSlack)
+}
+
+func (p *Server) every5SecondCollect() {
 	for {
 		time.Sleep(5 * time.Second)
-		slack, err := s.service.GetSlack(s.ns, fmt.Sprintf(common.NamespaceSlackName, s.ns))
-		if err != nil {
-			fmt.Printf("%s loop collect client info , failed get slack (%s)\n", common.ERROR, fmt.Sprintf(common.NamespaceSlackName, s.ns))
-			continue
-		}
 
-		var allTasks = make([]v1.Record, 0)
-		for _, k := range s.broadcast.GetClientIPs() {
+		for _, k := range p.broadcast.GetClientIPs() {
 			resp, err := client.NewHttpClient().IP(clientIp(k)).Port("8080").Get("/pods")
 			if err != nil {
 				fmt.Printf("%s failed to get error %s\n", common.WARN, err)
@@ -217,65 +488,80 @@ func (s *Server) every5SecondCollect() {
 				continue
 			}
 
-			for index, record := range tmpRecords {
+			for _, record := range tmpRecords {
 				if record.IsUpload {
-					allTasks = append(allTasks, record)
-				} else {
-					removeRecords(slack.Spec.AllTasks, index)
+					if err := p.addRecord(&record); err != nil {
+						fmt.Printf("%s failed add record (%s) error: (%s) \n", common.WARN, record.ServiceName, err)
+					}
+					continue
+				}
+
+				if err := p.removeRecord(&record); err != nil {
+					fmt.Printf("%s failed remove record (%s) error: (%s) \n", common.WARN, record.ServiceName, err)
+					continue
 				}
 			}
-		}
-
-		if len(allTasks) == 0 {
-			continue
-		}
-
-		slack.Spec.AllTasks = allTasks
-
-		if err := s.service.UpdateSlack(s.ns, slack.Name, slack); err != nil {
-			fmt.Printf("%s failed update slack status, error: (%s) \n", common.ERROR, err)
 		}
 	}
 
 }
 
-func (s *Server) Start() <-chan error {
-	errors := make(chan error, 2)
-	s.engine.GET("/:node", s.task)
+func (p *Server) addRecord(record *v1.Record) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
 
-	go s.watchSlack(errors)
-	go s.every5SecondCollect()
+	if p.curSlack == nil {
+		return nil
+	}
+
+	if p.curSlack.Spec.AllTasks == nil {
+		p.curSlack.Spec.AllTasks = make([]v1.Record, 0)
+		return nil
+	}
+	p.curSlack.Spec.AllTasks = append(p.curSlack.Spec.AllTasks, *record)
+	return p.service.UpdateSlack(p.curSlack)
+
+}
+
+func (p *Server) Start() <-chan error {
+	errors := make(chan error, 2)
+	p.engine.GET("/:node", p.task)
+
+	go p.watchSlack(errors)
+	go p.every5SecondCollect()
+	go p.podWatchStart(errors)
 
 	go func() {
-		errors <- s.engine.Run(s.addr)
+		errors <- p.engine.Run(p.addr)
 	}()
 
 	return errors
 
 }
 
-func (s *Server) task(g *gin.Context) {
+func (p *Server) task(g *gin.Context) {
 	watchChannel := make(chan string, 0)
 
 	id := clientID(g.Param("node"), g.ClientIP())
-	s.broadcast.Registry(id, watchChannel)
-	defer s.broadcast.UnRegistry(id)
+	p.broadcast.Registry(id, watchChannel)
+	defer p.broadcast.UnRegistry(id)
 
 	onceDo := false
 	g.Stream(func(w io.Writer) bool {
 		if !onceDo {
-			cmds, slack, err := s.firstCMDs()
+			cmds, slack, err := p.firstCMDs()
 			if err != nil {
-				fmt.Printf("[ERROR] failed list cmds")
 				return false
 			}
-			if err := s.service.UpdateSlack(s.ns, slack.Name, slack); err != nil {
-				fmt.Printf("[ERROR] failed update slack after first task (%v)", slack)
+
+			if err := p.service.UpdateSlack(slack); err != nil {
 				return false
 			}
+
 			for _, cmd := range cmds {
 				g.SSEvent("", cmd)
 			}
+
 			onceDo = true
 		}
 

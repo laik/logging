@@ -6,7 +6,6 @@ metadata:
   name: kube-system-logging-slack
   namespace: kube-system
 spec:
-  sink
   add_tasks:
     - filter:
         expr: '[INFO]'
@@ -30,7 +29,7 @@ cat << "EOF" | kubectl apply -f -
 apiVersion: logging.yamecloud.io/v1
 kind: Sink
 metadata:
-  name: kube-system-kafka-output
+  name: kube-system-logging-sink
   namespace: kube-system
 spec:
   type: kafka

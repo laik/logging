@@ -25,7 +25,7 @@ func main() {
 
 	config, err := configure.NewInstallConfigure(k8s.NewResources(
 		[]string{},
-		//types.KubernetesResourceInit,
+		types.KubernetesResourceInit,
 		types.YameCloudResourceInit,
 	))
 	if err != nil {
@@ -36,5 +36,4 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
 }

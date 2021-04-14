@@ -81,14 +81,11 @@ spec:
                       type: array
                     service_name:
                       type: string
-                    sink:
-                      type: string
                   required:
                   - filter
                   - ns
                   - pods
                   - service_name
-                  - sink
                   type: object
                 type: array
               all_tasks:
@@ -181,14 +178,11 @@ spec:
                       type: array
                     service_name:
                       type: string
-                    sink:
-                      type: string
                   required:
                   - filter
                   - ns
                   - pods
                   - service_name
-                  - sink
                   type: object
                 type: array
               selector:

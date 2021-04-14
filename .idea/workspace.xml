@@ -1,29 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b66bf896-90a2-4ce3-80e3-c41072917996" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/deploy/example/example.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/controller/controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/logging.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/logging.iml" afterDir="false" />
+    <list default="true" id="b66bf896-90a2-4ce3-80e3-c41072917996" name="Default Changelist" comment="xx">
+      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deploy/deployment/install_apiserver.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/api-server/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api-server/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/backend/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/monitor/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy/crds/logging.yamecloud.io_sinks.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deploy/crds/logging.yamecloud.io_sinks.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/monitor/main.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/deploy/crds/logging.yamecloud.io_slacks.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deploy/crds/logging.yamecloud.io_slacks.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy/exmaple/sink_example.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy/exmaple/slack_example.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deploy/daemonset/install_harvest.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deploy/daemonset/install_harvest.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deploy/example/example.sh" beforeDir="false" afterPath="$PROJECT_DIR$/deploy/example/example.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/api/other.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/other.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/api/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/output_type.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/sink_type.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/slack_type.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/slack_type.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/zz_generated.deepcopy.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/zz_generated.deepcopy.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/client/interface.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/client/interface.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/command/cmd.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/command/cmd.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/common/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/common/common.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/core/object.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/core/object.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/service/const.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/controller/controller.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/service/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/service/service.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -41,6 +30,14 @@
   <component name="GOROOT" url="file:///usr/local/go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
@@ -69,7 +66,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="go.sdk" />
   </component>
-  <component name="RunManager" selected="Go Build.go build github.com/yametech/logging/cmd/monitor">
+  <component name="RunManager" selected="Go Build.go build github.com/yametech/logging/cmd/api-server">
     <configuration name="go build github.com/yametech/logging/cmd/api-server" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="logging" />
       <working_directory value="$PROJECT_DIR$" />
@@ -96,8 +93,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build github.com/yametech/logging/cmd/monitor" />
         <item itemvalue="Go Build.go build github.com/yametech/logging/cmd/api-server" />
+        <item itemvalue="Go Build.go build github.com/yametech/logging/cmd/monitor" />
       </list>
     </recent_temporary>
   </component>
@@ -116,6 +113,10 @@
       </map>
     </option>
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="xx" />
+    <option name="LAST_COMMIT_MESSAGE" value="xx" />
+  </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
     <environment>
@@ -128,14 +129,29 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/cmd/monitor/main.go</url>
-          <line>30</line>
-          <option name="timeStamp" value="15" />
+          <url>file://$PROJECT_DIR$/pkg/controller/controller.go</url>
+          <line>66</line>
+          <option name="timeStamp" value="27" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/pkg/controller/controller.go</url>
-          <line>62</line>
-          <option name="timeStamp" value="16" />
+          <line>94</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/controller/controller.go</url>
+          <line>80</line>
+          <option name="timeStamp" value="29" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/controller/controller.go</url>
+          <line>57</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/controller/controller.go</url>
+          <line>93</line>
+          <option name="timeStamp" value="31" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
