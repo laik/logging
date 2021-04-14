@@ -20,7 +20,10 @@ func main() {
 	flag.Parse()
 
 	if ns == "" {
-		panic("ns must not be empty")
+		ns = os.Getenv("NAMESPACE")
+		if ns == "" {
+			panic("ns must not be empty")
+		}
 	}
 
 	config, err := configure.NewInstallConfigure(k8s.NewResources(

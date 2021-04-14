@@ -16,9 +16,10 @@ spec:
     spec:
       containers:
         - name: echoer-api
+          imagePullPolicy: Always
           image: 'yametech/logging-api-server:v1.0.0'
           args:
-            - '-ns ${NAMESPACE}'
+            - -incluster true
           env:
             - name: GIN_MODE
               value: release
