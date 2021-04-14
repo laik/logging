@@ -23,10 +23,8 @@ spec:
         - name: harvest
           image: 'yametech/harvest:latest'
           command: [ "sh","-c" ]
-          # TODO: 参数可以自动从变量里拿
           args:
-            - HOSTNAME=$NODE_NAME harvest --namespace kube-system --docker-dir /data/docker/containers --api-server http://172.16.150.183:9999
-          resources: { }
+            - HOSTNAME=$NODE_NAME harvest --namespace $NAMESPACE --docker-dir /data/docker/containers --api-server http://logging-api-server.$NAMESPACE.svc:9999/
           volumeMounts:
             - name: docker-dir
               mountPath: /data/docker/containers
