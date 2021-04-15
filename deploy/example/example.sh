@@ -6,20 +6,6 @@ metadata:
   name: kube-system-logging-slack
   namespace: kube-system
 spec:
-  add_tasks:
-    - filter:
-        expr: '[INFO]'
-        max_length: "102"
-      ns: kube-system
-      pods:
-        - container: echoer-api-86c648d678-z2p9p
-          ips:
-            - 127.0.0.1
-          node: node1
-          offset: 0
-          pod: echoer-api-86c648d678-z2p9p
-      service_name: echoer-api
-  delete_tasks: []
   selector: app=123
 EOF
 

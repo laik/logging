@@ -13,8 +13,10 @@ const (
 	Pod       = "pods"
 
 	// Yamecloud Logging
-	Sink  = "sinks"
-	Slack = "slacks"
+	Sink      = "sinks"
+	Slack     = "slacks"
+	SlackTask = "slacktasks"
+	Filter    = "filters"
 )
 
 func KubernetesResourceInit(rs *k8s.Resources) {
@@ -28,4 +30,6 @@ func YameCloudResourceInit(rs *k8s.Resources) {
 	// yamecloud logging operator resource
 	rs.Registry(Sink, schema.GroupVersionResource{Group: loggingYameCloudApiVersion, Version: "v1", Resource: Sink})
 	rs.Registry(Slack, schema.GroupVersionResource{Group: loggingYameCloudApiVersion, Version: "v1", Resource: Slack})
+	rs.Registry(SlackTask, schema.GroupVersionResource{Group: loggingYameCloudApiVersion, Version: "v1", Resource: SlackTask})
+	rs.Registry(Filter, schema.GroupVersionResource{Group: loggingYameCloudApiVersion, Version: "v1", Resource: Filter})
 }

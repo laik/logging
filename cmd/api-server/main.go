@@ -34,9 +34,8 @@ func main() {
 	if err != nil {
 		panic(fmt.Sprintf("new install configure error %s", err))
 	}
-
-	for err := range api.NewServer("0.0.0.0:9999", ns, service.NewIService(datasource.NewIDataSource(config))).Start() {
-		fmt.Println(err)
-		os.Exit(1)
+	server := api.NewServer("0.0.0.0:9999", ns, service.NewIService(datasource.NewIDataSource(config)))
+	if err := server.Start(); err != nil {
+		panic(err)
 	}
 }
