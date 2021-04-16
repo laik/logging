@@ -44,7 +44,7 @@ func slackTaskFromPod(_type watch.EventType, pod *corev1.Pod) *v1.SlackTask {
 			APIVersion: "logging.yamecloud.io/v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      pod.GetLabels()["app"],
+			Name:      fmt.Sprintf("%s-%s", pod.GetLabels()["app"], pod.Name),
 			Namespace: pod.GetNamespace(),
 		},
 		Spec: v1.SlackTaskSpec{

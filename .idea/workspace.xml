@@ -2,28 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b66bf896-90a2-4ce3-80e3-c41072917996" name="Default Changelist" comment="fix harvest install">
-      <change afterPath="$PROJECT_DIR$/deploy/crds/logging.yamecloud.io_filters.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/deploy/crds/logging.yamecloud.io_slacktasks.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/api/filter.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/api/pod.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/api/sink.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/api/slack.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/api/slack_task.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/filter_type.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/logging.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/logging.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/api-server/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api-server/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/dev/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/dev/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy/crds/logging.yamecloud.io_slacks.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deploy/crds/logging.yamecloud.io_slacks.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy/example/example.sh" beforeDir="false" afterPath="$PROJECT_DIR$/deploy/example/example.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/api/other.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/pod.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/pod.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/api/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/slack_type.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/slack_type.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/zz_generated.deepcopy.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/zz_generated.deepcopy.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/command/cmd.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/command/cmd.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/command/cmd_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/service/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/service/service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/types/type_list.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/types/type_list.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/slack_task.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/slack_task.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -151,7 +133,9 @@
     <MESSAGE value="fix harvest install" />
     <MESSAGE value="fix dockerfile not exec 211" />
     <MESSAGE value="fix namespace env" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix namespace env" />
+    <MESSAGE value="split service" />
+    <MESSAGE value="implemented slack slacktask logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="implemented slack slacktask logic" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -165,29 +149,34 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/pkg/controller/controller.go</url>
-          <line>66</line>
-          <option name="timeStamp" value="27" />
+          <url>file://$PROJECT_DIR$/pkg/service/service.go</url>
+          <line>147</line>
+          <option name="timeStamp" value="48" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/pkg/controller/controller.go</url>
-          <line>94</line>
-          <option name="timeStamp" value="28" />
+          <url>file://$PROJECT_DIR$/pkg/service/service.go</url>
+          <line>150</line>
+          <option name="timeStamp" value="50" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/pkg/controller/controller.go</url>
-          <line>80</line>
-          <option name="timeStamp" value="29" />
+          <url>file://$PROJECT_DIR$/pkg/service/service.go</url>
+          <line>116</line>
+          <option name="timeStamp" value="51" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/pkg/controller/controller.go</url>
-          <line>57</line>
-          <option name="timeStamp" value="30" />
+          <url>file://$PROJECT_DIR$/pkg/service/service.go</url>
+          <line>117</line>
+          <option name="timeStamp" value="52" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/pkg/controller/controller.go</url>
-          <line>93</line>
-          <option name="timeStamp" value="31" />
+          <url>file://$PROJECT_DIR$/pkg/core/object.go</url>
+          <line>34</line>
+          <option name="timeStamp" value="53" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/service/service.go</url>
+          <line>157</line>
+          <option name="timeStamp" value="56" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

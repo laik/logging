@@ -3,8 +3,11 @@ package api
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	stack "github.com/pkg/errors"
+	v1 "github.com/yametech/logging/pkg/apis/yamecloud/v1"
 	"github.com/yametech/logging/pkg/service"
 	"io"
+	"net/http"
 	"strings"
 )
 
@@ -54,21 +57,50 @@ func NewServer(addr string, ns string, service service.IService) *Server {
 	}
 }
 
+func (s *Server) slackTaskToCMDStr(slackTask *v1.SlackTask) string {
+	return ""
+}
+
+func (s *Server) getCMDsByNode(node string) ([]string, error) {
+	result := make([]string, 0)
+
+	slackTasks, _, err := s.service.ListSlackTask(s.ns)
+	if err != nil {
+		return nil, stack.WithStack(err)
+	}
+
+	for _, slackTask := range slackTasks {
+		if slackTask.Spec.Node != node {
+			continue
+		}
+		result = append(result, s.slackTaskToCMDStr(slackTask))
+	}
+
+	return result, nil
+}
+
 func (s *Server) task(g *gin.Context) {
 	watchChannel := make(chan string, 0)
 
-	id := clientID(g.Param("node"), g.ClientIP())
+	node := g.Param("node")
+	id := clientID(node, g.ClientIP())
 	s.broadcast.Registry(id, watchChannel)
 	defer s.broadcast.UnRegistry(id)
 
 	onceDo := false
 	g.Stream(func(w io.Writer) bool {
 		if !onceDo {
-			for taskCmd := range s.taskCmdList {
-				g.SSEvent("", taskCmd)
+			cmdList, err := s.getCMDsByNode(node)
+			if err != nil {
+				g.JSON(http.StatusInternalServerError, err)
+				return true
+			}
+			for _, cmd := range cmdList {
+				g.SSEvent("", cmd)
 			}
 			onceDo = true
 		}
+
 		select {
 		case cmd, ok := <-watchChannel:
 			if !ok {

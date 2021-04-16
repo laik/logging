@@ -62,7 +62,9 @@ NEXT:
 	if err != nil {
 		return stack.WithStack(err)
 	}
+
 	s.broadcast.Publish(cmdStr)
+
 	return nil
 }
 
