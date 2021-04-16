@@ -19,8 +19,8 @@ const (
 	ERROR = "[ERROR]"
 )
 
-const NamespaceSlackName = "%s-logging-slack"
-const NamespaceSinkName = "%s-logging-sink"
+const NamespaceSlackName = "logging-slack"
+const NamespaceSinkName = "logging-sink"
 
 func init() {
 	flag.BoolVar(&InCluster, "incluster", false, "-incluster true")

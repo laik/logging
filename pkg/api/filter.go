@@ -10,6 +10,4 @@ func NewFilter(service service.IService) IReconcile {
 	return Filter{service}
 }
 
-func (s Filter) Run(errors chan error) {
-
-}
+func (s Filter) Run(errors chan error) {}

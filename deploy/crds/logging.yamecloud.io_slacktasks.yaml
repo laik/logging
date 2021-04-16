@@ -24,7 +24,7 @@ spec:
       name: filter
       type: string
     - jsonPath: .spec.pod
-      name: filter
+      name: pod
       type: string
     name: v1
     schema:

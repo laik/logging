@@ -8,11 +8,14 @@ import (
 	"github.com/yametech/logging/pkg/datasource"
 	"github.com/yametech/logging/pkg/types"
 	corev1 "k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 )
 
 type IService interface {
 	WatchSlack(ns, resourceVersion string) (<-chan watch.Event, error)
+	Create(ns string) (*v1.Slack, error)
 	GetSlack(ns string) (*v1.Slack, error)
 	UpdateSlack(slack *v1.Slack) error
 
@@ -29,6 +32,40 @@ type IService interface {
 
 type Service struct {
 	datasource datasource.IDataSource
+}
+
+func (s *Service) Create(ns string) (*v1.Slack, error) {
+	defaultName := fmt.Sprintf("%s-%s", ns, common.NamespaceSlackName)
+	slack := &v1.Slack{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Slack",
+			APIVersion: "logging.yamecloud.io/v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      defaultName,
+			Namespace: ns,
+		},
+		Spec: v1.SlackSpec{
+			Selector: "",
+		},
+	}
+
+	unstructuredData, err := core.CopyFromRObject(slack)
+	if err != nil {
+		return nil, err
+	}
+
+	slackUnstructuredData, _, err := s.datasource.Apply(ns, types.Slack, defaultName, unstructuredData, false)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := core.CopyToRuntimeObject(slackUnstructuredData, slack); err != nil {
+		return nil, err
+	}
+
+	return slack, nil
+
 }
 
 func (s *Service) ApplySlackTask(ns string, slackTask *v1.SlackTask) error {
@@ -60,6 +97,9 @@ func (s *Service) ListSlackTask(ns string) ([]*v1.SlackTask, string, error) {
 func (s *Service) GetFilter(ns, name string) (*v1.Filter, error) {
 	unstructuredData, err := s.datasource.Get(ns, types.Filter, name)
 	if err != nil {
+		if k8serrors.IsNotFound(err) {
+			return &v1.Filter{Spec: v1.FilterSpec{MaxLength: 1e9, Expr: "*"}}, nil
+		}
 		return nil, err
 	}
 
@@ -75,8 +115,11 @@ func (s *Service) WatchSlackTask(ns, resourceVersion string) (<-chan watch.Event
 }
 
 func (s *Service) GetSlack(ns string) (*v1.Slack, error) {
-	unstructuredData, err := s.datasource.Get(ns, types.Slack, fmt.Sprintf(common.NamespaceSlackName, ns))
+	unstructuredData, err := s.datasource.Get(ns, types.Slack, fmt.Sprintf("%s-%s", ns, common.NamespaceSlackName))
 	if err != nil {
+		if k8serrors.IsNotFound(err) {
+			return nil, nil
+		}
 		return nil, err
 	}
 
@@ -84,6 +127,7 @@ func (s *Service) GetSlack(ns string) (*v1.Slack, error) {
 	if err := core.CopyToRuntimeObject(unstructuredData, slack); err != nil {
 		return nil, err
 	}
+
 	return slack, nil
 }
 
@@ -102,10 +146,12 @@ func (s *Service) WatchSlack(ns, resourceVersion string) (<-chan watch.Event, er
 
 func (s *Service) ListPod(ns string, selector string) ([]*corev1.Pod, string, error) {
 	result := make([]*corev1.Pod, 0)
+
 	unstructuredList, err := s.datasource.List(ns, types.Pod, "", 0, 0, selector)
 	if err != nil {
 		return nil, "", err
 	}
+
 	for _, unstructuredData := range unstructuredList.Items {
 		pod := corev1.Pod{}
 		if err := core.CopyToRuntimeObject(&unstructuredData, &pod); err != nil {
@@ -113,6 +159,7 @@ func (s *Service) ListPod(ns string, selector string) ([]*corev1.Pod, string, er
 		}
 		result = append(result, &pod)
 	}
+
 	return result, unstructuredList.GetResourceVersion(), nil
 }
 

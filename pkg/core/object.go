@@ -31,7 +31,7 @@ func FromRuntimeObject(r runtime.Object) (Object, error) {
 }
 
 func CopyToRuntimeObject(src *unstructured.Unstructured, target runtime.Object) error {
-	bytesData, err := json.Marshal(src)
+	bytesData, err := json.Marshal(src.Object)
 	if err != nil {
 		return err
 	}

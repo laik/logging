@@ -57,6 +57,7 @@ func (i *IDataSourceImpl) List(namespace, resource, flag string, pos, size int64
 	if selector == nil || selector == "" {
 		selector = labels.Everything()
 	}
+
 	switch selector.(type) {
 	case labels.Selector:
 		opts.LabelSelector = selector.(labels.Selector).String()
