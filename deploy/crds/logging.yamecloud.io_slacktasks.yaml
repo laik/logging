@@ -20,11 +20,14 @@ spec:
     - jsonPath: .spec.service_name
       name: service
       type: string
-    - jsonPath: .spec.filter
-      name: filter
+    - jsonPath: .spec.node
+      name: node
       type: string
     - jsonPath: .spec.pod
       name: pod
+      type: string
+    - jsonPath: .spec.filter
+      name: filter
       type: string
     name: v1
     schema:

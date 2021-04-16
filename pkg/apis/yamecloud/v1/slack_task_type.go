@@ -13,8 +13,9 @@ import (
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +kubebuilder:printcolumn:name="service",type=string,JSONPath=`.spec.service_name`
-// +kubebuilder:printcolumn:name="filter",type=string,JSONPath=`.spec.filter`
+// +kubebuilder:printcolumn:name="node",type=string,JSONPath=`.spec.node`
 // +kubebuilder:printcolumn:name="pod",type=string,JSONPath=`.spec.pod`
+// +kubebuilder:printcolumn:name="filter",type=string,JSONPath=`.spec.filter`
 type SlackTask struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

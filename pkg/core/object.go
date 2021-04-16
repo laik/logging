@@ -60,3 +60,15 @@ func Convert(src runtime.Object, target runtime.Object) error {
 	}
 	return nil
 }
+
+func GetByString(obj, path string) (bool, interface{}) {
+	_map := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(obj), &_map); err != nil {
+		return false, nil
+	}
+	result := Get(_map, path)
+	if result == nil {
+		return false, nil
+	}
+	return true, result
+}

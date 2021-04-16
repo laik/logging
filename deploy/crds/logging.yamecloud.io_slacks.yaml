@@ -91,6 +91,7 @@ spec:
                     ns:
                       type: string
                     offset:
+                      format: int64
                       type: integer
                     output:
                       type: string

@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b66bf896-90a2-4ce3-80e3-c41072917996" name="Default Changelist" comment="fix harvest install">
+    <list default="true" id="b66bf896-90a2-4ce3-80e3-c41072917996" name="Default Changelist" comment="addx">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deploy/crds/logging.yamecloud.io_slacks.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deploy/crds/logging.yamecloud.io_slacks.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deploy/crds/logging.yamecloud.io_slacktasks.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deploy/crds/logging.yamecloud.io_slacktasks.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/api/pod.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/pod.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/api/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/sink.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/sink.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/api/slack.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/slack.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/api/slack_task.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/api/slack_task.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/slack_task_type.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/slack_task_type.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/slack_type.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/apis/yamecloud/v1/slack_type.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/core/object.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/core/object.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/service/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/service/service.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,7 +143,8 @@
     <MESSAGE value="fix namespace env" />
     <MESSAGE value="split service" />
     <MESSAGE value="implemented slack slacktask logic" />
-    <option name="LAST_COMMIT_MESSAGE" value="implemented slack slacktask logic" />
+    <MESSAGE value="addx" />
+    <option name="LAST_COMMIT_MESSAGE" value="addx" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -150,33 +159,48 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/pkg/service/service.go</url>
-          <line>147</line>
-          <option name="timeStamp" value="48" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/pkg/service/service.go</url>
-          <line>150</line>
-          <option name="timeStamp" value="50" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/pkg/service/service.go</url>
-          <line>116</line>
+          <line>81</line>
           <option name="timeStamp" value="51" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/pkg/service/service.go</url>
-          <line>117</line>
+          <line>82</line>
           <option name="timeStamp" value="52" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/pkg/core/object.go</url>
-          <line>34</line>
-          <option name="timeStamp" value="53" />
+          <url>file://$PROJECT_DIR$/pkg/service/service.go</url>
+          <line>71</line>
+          <option name="timeStamp" value="61" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/pkg/service/service.go</url>
-          <line>157</line>
-          <option name="timeStamp" value="56" />
+          <line>90</line>
+          <option name="timeStamp" value="62" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/service/service.go</url>
+          <line>91</line>
+          <option name="timeStamp" value="63" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/service/service.go</url>
+          <line>92</line>
+          <option name="timeStamp" value="64" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/cmd/api-server/main.go</url>
+          <line>37</line>
+          <option name="timeStamp" value="71" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/api/slack.go</url>
+          <line>92</line>
+          <option name="timeStamp" value="72" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/api/slack.go</url>
+          <line>85</line>
+          <option name="timeStamp" value="73" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

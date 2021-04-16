@@ -4,6 +4,7 @@ import (
 	"fmt"
 	stack "github.com/pkg/errors"
 	v1 "github.com/yametech/logging/pkg/apis/yamecloud/v1"
+	"github.com/yametech/logging/pkg/common"
 	"github.com/yametech/logging/pkg/core"
 	"github.com/yametech/logging/pkg/service"
 	corev1 "k8s.io/api/core/v1"
@@ -44,13 +45,14 @@ func slackTaskFromPod(_type watch.EventType, pod *corev1.Pod) *v1.SlackTask {
 			APIVersion: "logging.yamecloud.io/v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      fmt.Sprintf("%s-%s", pod.GetLabels()["app"], pod.Name),
+			Name:      pod.Name,
 			Namespace: pod.GetNamespace(),
 		},
 		Spec: v1.SlackTaskSpec{
 			Type:        _type,
 			Ns:          pod.GetNamespace(),
 			ServiceName: pod.GetLabels()["app"],
+			Node:        pod.Spec.NodeName,
 			Pod:         pod.GetName(),
 			Ips:         ips,
 			Offset:      0,
@@ -69,6 +71,12 @@ RETRY:
 		}
 		errors <- stack.WithStack(err)
 		return
+	}
+
+	if slack.Spec.Selector == "" {
+		fmt.Printf("%s slack selector not define\n", common.WARN)
+		time.Sleep(3 * time.Second)
+		goto RETRY
 	}
 
 	podList, resourceVersion, err := s.ListPod(s.ns, slack.Spec.Selector)

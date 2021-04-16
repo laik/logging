@@ -28,7 +28,7 @@ type Record struct {
 	LastOffset  int      `json:"last_offset"`
 	NodeName    string   `json:"node_name"`
 	Ns          string   `json:"ns"`
-	Offset      int      `json:"offset"`
+	Offset      uint64   `json:"offset"`
 	Output      string   `json:"output"`
 	Path        string   `json:"path"`
 	PodName     string   `json:"pod_name"`

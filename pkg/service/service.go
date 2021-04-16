@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	stack "github.com/pkg/errors"
 	v1 "github.com/yametech/logging/pkg/apis/yamecloud/v1"
 	"github.com/yametech/logging/pkg/common"
 	"github.com/yametech/logging/pkg/core"
@@ -15,7 +16,7 @@ import (
 
 type IService interface {
 	WatchSlack(ns, resourceVersion string) (<-chan watch.Event, error)
-	Create(ns string) (*v1.Slack, error)
+	CreateSlack(ns string) (*v1.Slack, error)
 	GetSlack(ns string) (*v1.Slack, error)
 	UpdateSlack(slack *v1.Slack) error
 
@@ -23,6 +24,7 @@ type IService interface {
 	WatchPod(ns string, resourceVersion, selector string) (<-chan watch.Event, error)
 
 	GetSink(ns string) (*v1.Sink, error)
+	CreateSink(ns string) (*v1.Sink, error)
 	GetFilter(ns, name string) (*v1.Filter, error)
 
 	ListSlackTask(ns string) ([]*v1.SlackTask, string, error)
@@ -34,7 +36,38 @@ type Service struct {
 	datasource datasource.IDataSource
 }
 
-func (s *Service) Create(ns string) (*v1.Slack, error) {
+func (s *Service) CreateSink(ns string) (*v1.Sink, error) {
+	defaultName := fmt.Sprintf("%s-%s", ns, common.NamespaceSinkName)
+	sink := &v1.Sink{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Sink",
+			APIVersion: "logging.yamecloud.io/v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      defaultName,
+			Namespace: ns,
+		},
+		Spec: v1.SinkSpec{},
+	}
+
+	unstructuredData, err := core.CopyFromRObject(sink)
+	if err != nil {
+		return nil, stack.WithStack(err)
+	}
+
+	slackUnstructuredData, _, err := s.datasource.Apply(ns, types.Sink, defaultName, unstructuredData, false)
+	if err != nil {
+		return nil, stack.WithStack(err)
+	}
+
+	if err := core.CopyToRuntimeObject(slackUnstructuredData, sink); err != nil {
+		return nil, stack.WithStack(err)
+	}
+
+	return sink, nil
+}
+
+func (s *Service) CreateSlack(ns string) (*v1.Slack, error) {
 	defaultName := fmt.Sprintf("%s-%s", ns, common.NamespaceSlackName)
 	slack := &v1.Slack{
 		TypeMeta: metav1.TypeMeta{
@@ -52,16 +85,16 @@ func (s *Service) Create(ns string) (*v1.Slack, error) {
 
 	unstructuredData, err := core.CopyFromRObject(slack)
 	if err != nil {
-		return nil, err
+		return nil, stack.WithStack(err)
 	}
 
 	slackUnstructuredData, _, err := s.datasource.Apply(ns, types.Slack, defaultName, unstructuredData, false)
 	if err != nil {
-		return nil, err
+		return nil, stack.WithStack(err)
 	}
 
 	if err := core.CopyToRuntimeObject(slackUnstructuredData, slack); err != nil {
-		return nil, err
+		return nil, stack.WithStack(err)
 	}
 
 	return slack, nil
@@ -80,14 +113,14 @@ func (s *Service) ApplySlackTask(ns string, slackTask *v1.SlackTask) error {
 func (s *Service) ListSlackTask(ns string) ([]*v1.SlackTask, string, error) {
 	unstructuredList, err := s.datasource.List(ns, types.SlackTask, "", 0, 0, nil)
 	if err != nil {
-		return nil, "", err
+		return nil, "", stack.WithStack(err)
 	}
 
 	result := make([]*v1.SlackTask, 0)
 	for _, unstructuredData := range unstructuredList.Items {
 		slackTask := v1.SlackTask{}
 		if err := core.CopyToRuntimeObject(&unstructuredData, &slackTask); err != nil {
-			return nil, "", err
+			return nil, "", stack.WithStack(err)
 		}
 		result = append(result, &slackTask)
 	}
@@ -100,12 +133,12 @@ func (s *Service) GetFilter(ns, name string) (*v1.Filter, error) {
 		if k8serrors.IsNotFound(err) {
 			return &v1.Filter{Spec: v1.FilterSpec{MaxLength: 1e9, Expr: "*"}}, nil
 		}
-		return nil, err
+		return nil, stack.WithStack(err)
 	}
 
 	filter := &v1.Filter{}
 	if err := core.CopyToRuntimeObject(unstructuredData, filter); err != nil {
-		return nil, err
+		return nil, stack.WithStack(err)
 	}
 	return filter, nil
 }
@@ -120,12 +153,12 @@ func (s *Service) GetSlack(ns string) (*v1.Slack, error) {
 		if k8serrors.IsNotFound(err) {
 			return nil, nil
 		}
-		return nil, err
+		return nil, stack.WithStack(err)
 	}
 
 	slack := &v1.Slack{}
 	if err := core.CopyToRuntimeObject(unstructuredData, slack); err != nil {
-		return nil, err
+		return nil, stack.WithStack(err)
 	}
 
 	return slack, nil
@@ -149,13 +182,13 @@ func (s *Service) ListPod(ns string, selector string) ([]*corev1.Pod, string, er
 
 	unstructuredList, err := s.datasource.List(ns, types.Pod, "", 0, 0, selector)
 	if err != nil {
-		return nil, "", err
+		return nil, "", stack.WithStack(err)
 	}
 
 	for _, unstructuredData := range unstructuredList.Items {
 		pod := corev1.Pod{}
 		if err := core.CopyToRuntimeObject(&unstructuredData, &pod); err != nil {
-			return nil, "", err
+			return nil, "", stack.WithStack(err)
 		}
 		result = append(result, &pod)
 	}
@@ -168,14 +201,17 @@ func (s *Service) WatchPod(ns string, resourceVersion, selector string) (<-chan 
 }
 
 func (s *Service) GetSink(ns string) (*v1.Sink, error) {
-	unstructuredData, err := s.datasource.Get(ns, types.Sink, fmt.Sprintf(common.NamespaceSinkName, ns))
+	unstructuredData, err := s.datasource.Get(ns, types.Sink, fmt.Sprintf("%s-%s", ns, common.NamespaceSinkName))
 	if err != nil {
-		return nil, err
+		if k8serrors.IsNotFound(err) {
+			return nil, nil
+		}
+		return nil, stack.WithStack(err)
 	}
 
 	sink := &v1.Sink{}
 	if err := core.CopyToRuntimeObject(unstructuredData, sink); err != nil {
-		return nil, err
+		return nil, stack.WithStack(err)
 	}
 	return sink, nil
 }
@@ -185,7 +221,7 @@ func (s *Service) ListTask(ns string) ([]core.Object, error) {
 
 	items, err := s.datasource.List(ns, types.Slack, "", 0, 0, nil)
 	if err != nil {
-		return nil, err
+		return nil, stack.WithStack(err)
 	}
 
 	for _, item := range items.Items {
