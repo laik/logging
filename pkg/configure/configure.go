@@ -7,11 +7,12 @@ import (
 	client "k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"os"
 )
 
 type RuntimeMode string
 
-var AppRuntimeMode RuntimeMode = Default
+var AppRuntimeMode RuntimeMode = DEFAULT
 
 func SetTheAppRuntimeMode(rm RuntimeMode) {
 	AppRuntimeMode = rm
@@ -19,9 +20,9 @@ func SetTheAppRuntimeMode(rm RuntimeMode) {
 
 const (
 	// InCluster when deploying in k8s, use this option
-	InCluster RuntimeMode = "InCluster"
+	INCLUSTER RuntimeMode = "InCluster"
 	// Default when deploying in non k8s, use this option and the is default option
-	Default RuntimeMode = "Default"
+	DEFAULT RuntimeMode = "Default"
 )
 
 // InstallConfigure ...
@@ -47,10 +48,10 @@ func NewInstallConfigure(k8sResLister k8s.ResourceLister) (*InstallConfigure, er
 	)
 
 	switch AppRuntimeMode {
-	case Default:
+	case DEFAULT:
 		fmt.Printf("%s start app is Default mode", common.INFO)
 		cli, resetConfig, err = k8s.BuildClientSet(*common.KubeConfig)
-	case InCluster:
+	case INCLUSTER:
 		fmt.Printf("%s start app is InCluster mode", common.INFO)
 		_, resetConfig, err = k8s.CreateInClusterConfig()
 		if err != nil {
@@ -78,4 +79,10 @@ func NewInstallConfigure(k8sResLister k8s.ResourceLister) (*InstallConfigure, er
 		ResourceLister:       k8sResLister,
 		Clientset:            clientSet,
 	}, nil
+}
+
+func init() {
+	if os.Getenv("INCLUSTER") != "" {
+		SetTheAppRuntimeMode(INCLUSTER)
+	}
 }
