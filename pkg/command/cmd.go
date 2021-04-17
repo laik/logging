@@ -33,6 +33,11 @@ func CMD(ops ...Option) (string, error) {
 	for _, op := range ops {
 		op(cmd)
 	}
+	if cmd.Filter == nil {
+		cmd.Filter = make(map[string]interface{})
+		cmd.Filter["max_length"] = 1e9
+		cmd.Filter["expr"] = "*"
+	}
 	return cmd.ToString()
 }
 
