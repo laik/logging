@@ -33,3 +33,7 @@ install: manifests
 
 uninstall: manifests
 	kubectl delete -f deploy/crds/
+
+build:
+	docker build -t yametech/logging-api-server:v1.0.0 .
+	docker push yametech/logging-api-server:v1.0.0

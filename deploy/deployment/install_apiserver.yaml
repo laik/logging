@@ -17,6 +17,7 @@ spec:
       containers:
         - name: echoer-api
           imagePullPolicy: Always
+          serviceAccount: logging
           image: 'yametech/logging-api-server:v1.0.0'
           args:
             - -incluster true
