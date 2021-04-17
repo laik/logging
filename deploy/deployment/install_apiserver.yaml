@@ -14,13 +14,13 @@ spec:
       labels:
         app: logging-api-server
     spec:
+      serviceAccount: logging
       containers:
         - name: echoer-api
           imagePullPolicy: Always
-          serviceAccount: logging
           image: 'yametech/logging-api-server:v1.0.0'
           args:
-            - -incluster true
+            - -incluster=true
           env:
             - name: GIN_MODE
               value: release

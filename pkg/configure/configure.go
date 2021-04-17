@@ -48,14 +48,20 @@ func NewInstallConfigure(k8sResLister k8s.ResourceLister) (*InstallConfigure, er
 
 	switch AppRuntimeMode {
 	case Default:
+		fmt.Printf("%s start app is Default mode", common.INFO)
 		cli, resetConfig, err = k8s.BuildClientSet(*common.KubeConfig)
 	case InCluster:
+		fmt.Printf("%s start app is InCluster mode", common.INFO)
 		_, resetConfig, err = k8s.CreateInClusterConfig()
 		if err != nil {
 			return nil, err
 		}
 	default:
 		return nil, fmt.Errorf("not define the runtime mode")
+	}
+
+	if resetConfig == nil {
+		return nil, fmt.Errorf("failed to init rest config")
 	}
 
 	cacheInformerFactory, err := k8s.NewCacheInformerFactory(k8sResLister, resetConfig)
