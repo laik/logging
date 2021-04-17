@@ -19,11 +19,11 @@ spec:
         - name: echoer-api
           imagePullPolicy: Always
           image: 'yametech/logging-api-server:v1.0.0'
-          args:
-            - -incluster=true
           env:
             - name: GIN_MODE
               value: release
+            - name: INCLUSTER
+              value: 'true'
             - name: NAMESPACE
               valueFrom:
                 fieldRef:
