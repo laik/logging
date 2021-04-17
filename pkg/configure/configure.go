@@ -49,10 +49,10 @@ func NewInstallConfigure(k8sResLister k8s.ResourceLister) (*InstallConfigure, er
 
 	switch AppRuntimeMode {
 	case DEFAULT:
-		fmt.Printf("%s start app is Default mode", common.INFO)
+		fmt.Printf("%s start app is Default mode\n", common.INFO)
 		cli, resetConfig, err = k8s.BuildClientSet(*common.KubeConfig)
 	case INCLUSTER:
-		fmt.Printf("%s start app is InCluster mode", common.INFO)
+		fmt.Printf("%s start app is InCluster mode\n", common.INFO)
 		_, resetConfig, err = k8s.CreateInClusterConfig()
 		if err != nil {
 			return nil, err
