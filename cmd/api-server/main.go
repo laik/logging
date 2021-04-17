@@ -14,9 +14,11 @@ import (
 )
 
 var ns string
+var inCluster bool
 
 func main() {
 	flag.StringVar(&ns, "ns", "", "-ns kube-system")
+	flag.BoolVar(&inCluster, "ns", false, "-incluster true")
 	flag.Parse()
 
 	if ns == "" {
@@ -24,6 +26,10 @@ func main() {
 		if ns == "" {
 			panic("ns must not be empty")
 		}
+	}
+
+	if inCluster {
+		configure.SetTheAppRuntimeMode(configure.InCluster)
 	}
 
 	config, err := configure.NewInstallConfigure(k8s.NewResources(
