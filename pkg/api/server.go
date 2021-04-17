@@ -51,8 +51,8 @@ func NewServer(addr string, ns string, service service.IService) *Server {
 	broadcast := NewBroadcast()
 	reconciles := []IReconcile{
 		NewSlack(ns, broadcast, service),
-		//NewPod(ns, service),
-		//NewSlackTask(ns, broadcast, service),
+		NewPod(ns, service),
+		NewSlackTask(ns, broadcast, service),
 	}
 
 	return &Server{

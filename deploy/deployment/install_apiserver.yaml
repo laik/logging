@@ -16,9 +16,9 @@ spec:
     spec:
       serviceAccount: logging
       containers:
-        - name: echoer-api
+        - name: api-server
           imagePullPolicy: Always
-          image: 'yametech/logging-api-server:v1.0.0'
+          image: 'harbor.ym/devops/logging-api-server:v1.0.0'
           env:
             - name: GIN_MODE
               value: release
